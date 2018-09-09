@@ -1,7 +1,9 @@
 
-- Kubernetes General Documentation
-- https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/
-
+# Kubernetes Knowledge
+## Kubernetes General Documentation
+---
+https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/
+---
 - Kubernetes Course File
 https://github.com/jleetutorial/kuburnetes-demo
 
@@ -41,15 +43,15 @@ $ kubectl apply -f ./deployment.yaml
 
 $ kubectl get pods
 $ kubectl get pods [pod name] 
-$ kubectl expose <type name> <identifier/name> [—port=external port] [—target-port=container-port [—type=service-type]
+$ kubectl expose <type name> <identifier/name> [â€”port=external port] [â€”target-port=container-port [â€”type=service-type]
 $ kubectl expose deployment tomcat-deployment --type=NodePort 
 $ kubectl port-forward <pod name> [LOCAL_PORT:]REMOTE_PORT] 
 $ kubectl attach <pod name> -c <container>  
-$ kubectl exec  [-it] <pod name> [-c CONTAINER] — COMMAND [args…]
+$ kubectl exec  [-it] <pod name> [-c CONTAINER] â€” COMMAND [argsâ€¦]
 $ kubectl exec -it <pod name> bash  
-$ kubectl label [—overwrite] <type> KEY_1=VAL_1 ….
+$ kubectl label [â€”overwrite] <type> KEY_1=VAL_1 â€¦.
 $ kubectl label pods <pod name> healthy=fasle  
-$ kubectl run <name> —image=image
+$ kubectl run <name> â€”image=image
 $ kubectl run hazelcast --image=hazelcast/hazelcast --port=5701
 $ kubectl describe pod
 
