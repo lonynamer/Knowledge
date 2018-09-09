@@ -1,92 +1,89 @@
-### Kubernetes Knowledge
-#### Kubernetes General Documentation & References
+## Kubernetes Knowledge
+### Kubernetes General Documentation & References
 ---
 - Kubernetes Docs
 https://kubernetes.io/docs/
 - Kubernetes Course File
 https://github.com/jleetutorial/kuburnetes-demo
 ---
-#### Clients
+### Clients
 ---
 - `kubectl` is the client commands tool.
 - `Kitematic` is a visual docker client.
 ---
-#### Servers
+### Servers
 ---
 - `Minikube` is a standalone single server type of Kubernetes. Can be used for studying purposes.
    The things runs the same ways like on a complex Kubernetes infrastructure.
 - On windows and old MAC `docker toolbox` and it runs inside `virtual box`. 
 ---
-#### Getting Started
-How to install minikube
+### Getting Started
+#### How to install minikube
 ---
 https://kubernetes.io/docs/tasks/tools/install-minikube/
 ---
-
 Start, Stop
 ```
 minikube start
 minikube stop
 ```
+Container > Pods > Deployments
+- Run/Create a pod. Pod wraps a container. Usage is one container in one pod. Uni
+- Container is unit of a pod. 
+kubectl run `deployment name` --image=`image-to-install` --port=`port-to-open-internally`
+```
 kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
-
-kubectl expose deployment hello-minikube --type=NodePort
-
 kubectl get pod
-
-minikube service hello-minikube --url
-
-# Get files
-https://hub.com/jleetutorial/dockerapp.git/
-  
-# How to Install kubectl and minikube on  Linux: 
-  
-$curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.23.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
- 
-$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.23.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
-$ minikube start
-kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
-
+kubectl describe pod
+kubectl get deployment
+kubectl delete deployment hello-minikube
+```
+Expose Publish A Container/Create a `Service` (`Nodeport`,`Loadbalancer`)
+- NodePort opens port for your service on holding server and portmaps to port of your pod.
+- NodePort range 30000-32767, NodePort only for testing.
+- LoadBalancer portmaps your desired port to ClusterIP.
+- In both types private Cluster IP is created randomly. 
+```
 kubectl expose deployment hello-minikube --type=NodePort
-
-kubectl get pod
-
+kubectl expose deployment hello-minikube --type=LoadBalancer
+kubectl get service
+```
+- Only in `Minikube`
+```
 minikube service hello-minikube --url
-
-# Get files
-https://hub.com/jleetutorial/dockerapp.git/
-  
-# How to Install kubectl and minikube on  Linux: 
-  
-$curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.23.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
- 
-$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.23.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
-$ minikube start
-$ kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
-$ kubectl expose deployment hello-minikube  --type=NodePort
-$ kubectl get pod
-$ curl $(minikube service hello-minikube --url)
-$ kubectl delete deployment hello-minikube
-$ minikube stop
-$ kubectl apply -f ./deployment.yaml
-
-
-$ kubectl get pods
-$ kubectl get pods [pod name] 
-$ kubectl expose <type name> <identifier/name> [—port=external port] [—target-port=container-port [—type=service-type]
-$ kubectl expose deployment tomcat-deployment --type=NodePort 
-$ kubectl port-forward <pod name> [LOCAL_PORT:]REMOTE_PORT] 
-$ kubectl attach <pod name> -c <container>  
-$ kubectl exec  [-it] <pod name> [-c CONTAINER] — COMMAND [args…]
-$ kubectl exec -it <pod name> bash  
-$ kubectl label [—overwrite] <type> KEY_1=VAL_1 ….
-$ kubectl label pods <pod name> healthy=fasle  
-$ kubectl run <name> —image=image
-$ kubectl run hazelcast --image=hazelcast/hazelcast --port=5701
-$ kubectl describe pod
-
-#Yaml File Example
-
+curl $(minikube service hello-minikube --url)
+```
+Pods, Services, Deployments, Networks, Storages, Kubernetes Addons, Namespace etc.,
+all can be described, installed and changed by yaml file like this.
+```
+kubectl apply -f ./deployment.yaml
+```
+Some Important Commands To Know After Kubectl
+- `get` shows 
+- `describe` describes in json format
+- `expose` publishes outside.
+- `exec` runs a command in a pod, like you can run bash/sh and connect to console. -it (interactive and tty)
+- `attach` attachs a container like, you have a backgrounded bash, attach is used to attach.
+- `label` assings key:value pairs, some key value pairs like app, tier are used to attach services/components together.
+   Like Deployment, Service, Pod, Container, Storage. As labels and selectors.
+- `run` runs.
+```
+kubectl get pods
+kubectl get pods [pod name] 
+kubectl expose <type name> <identifier/name> [—port=external port] [—target-port=container-port [—type=service-type]
+kubectl expose deployment tomcat-deployment --type=NodePort 
+kubectl port-forward <pod name> [LOCAL_PORT:]REMOTE_PORT] 
+kubectl attach <pod name> -c <container>  
+kubectl exec  [-it] <pod name> [-c CONTAINER] — COMMAND [args…]
+kubectl exec -it <pod name> bash  
+kubectl label [—overwrite] <type> KEY_1=VAL_1 ….
+kubectl label pods <pod name> healthy=fasle  
+kubectl run <name> —image=image
+kubectl run hazelcast --image=hazelcast/hazelcast --port=5701
+kubectl describe pod
+```
+###Yaml File Example
+```
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -106,7 +103,7 @@ spec:
         image: tomcat:9.0
         ports:
         - containerPort: 8080
-
+```
 
 # PORT FORWARDING FOR A SINGLE POD
 $ kubectl port-forward tomcat-deployment-794dbf9966-7lmtq 5000:6000
