@@ -1,11 +1,11 @@
 ### Kubernetes Knowledge
 #### Kubernetes General Documentation & References
----```
+---
 - Kubernetes Docs
 https://kubernetes.io/docs/
 - Kubernetes Course File
 https://github.com/jleetutorial/kuburnetes-demo
----```
+---
 #### Clients
 - "kubectl" is the client commands tool.
 - "Kitematic" is a visual docker client.
