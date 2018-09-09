@@ -1,9 +1,10 @@
 
-# Kubernetes Knowledge
-## Kubernetes General Documentation
----
-https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/
----
+## Kubernetes Knowledge
+
+- Kubernetes General Documentation
+- https://kubernetes.io/docs/
+- https://github.com/kubernetes/
+
 - Kubernetes Course File
 https://github.com/jleetutorial/kuburnetes-demo
 
@@ -14,6 +15,10 @@ https://github.com/jleetutorial/kuburnetes-demo
 
 
 Section 3 - Getting Started
+- Install and start minikube
+```
+https://kubernetes.io/docs/tasks/tools/install-minikube/
+```
 minikube start
 kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
 
