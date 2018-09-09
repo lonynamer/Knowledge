@@ -11,16 +11,23 @@ https://github.com/jleetutorial/kuburnetes-demo
 - `kubectl` is the client commands tool.
 - `Kitematic` is a visual docker client.
 ---
-
 #### Servers
 ---
 - `Minikube` is a standalone single server type of Kubernetes. Can be used for studying purposes.
    The things runs the same ways like on a complex Kubernetes infrastructure.
 - On windows and old MAC `docker toolbox` and it runs inside `virtual box`. 
 ---
+#### Getting Started
+How to install minikube
+---
+https://kubernetes.io/docs/tasks/tools/install-minikube/
+---
 
-#### Starting Minikube and 
+Start, Stop
+```
 minikube start
+minikube stop
+```
 kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
 
 kubectl expose deployment hello-minikube --type=NodePort
