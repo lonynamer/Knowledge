@@ -7,13 +7,17 @@ https://kubernetes.io/docs/
 https://github.com/jleetutorial/kuburnetes-demo
 ---
 #### Clients
-- "kubectl" is the client commands tool.
-- "Kitematic" is a visual docker client.
+---
+- `kubectl` is the client commands tool.
+- `Kitematic` is a visual docker client.
+---
 
 #### Servers
-- "Minikube" is a standalone single server type of Kubernetes. Can be used for studying purposes.
+---
+- `Minikube` is a standalone single server type of Kubernetes. Can be used for studying purposes.
    The things runs the same ways like on a complex Kubernetes infrastructure.
-- On windows and old MAC "docker toolbox" and it runs inside "virtual box". 
+- On windows and old MAC `docker toolbox` and it runs inside `virtual box`. 
+---
 
 #### Starting Minikube and 
 minikube start
