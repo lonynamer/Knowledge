@@ -1,25 +1,39 @@
-
-## Kubernetes Knowledge
-
-- Kubernetes General Documentation
-- https://kubernetes.io/docs/
-- https://github.com/kubernetes/
-
+### Kubernetes Knowledge
+#### Kubernetes General Documentation & References
+```
+- Kubernetes Docs
+https://kubernetes.io/docs/
 - Kubernetes Course File
 https://github.com/jleetutorial/kuburnetes-demo
-
-*** Kitematic visual docker client.
-
-
-*** On old MAC and Windows instead of docker, you install docker toolboc. It runs inside virtual box.
-
-
-Section 3 - Getting Started
-- Install and start minikube
 ```
-https://kubernetes.io/docs/tasks/tools/install-minikube/
-```
+#### Clients
+- "kubectl" is the client commands tool.
+- "Kitematic" is a visual docker client.
+
+#### Servers
+- "Minikube" is a standalone single server type of Kubernetes. Can be used for studying purposes.
+   The things runs the same ways like on a complex Kubernetes infrastructure.
+- On windows and old MAC "docker toolbox" and it runs inside "virtual box". 
+
+#### Starting Minikube and 
 minikube start
+kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
+
+kubectl expose deployment hello-minikube --type=NodePort
+
+kubectl get pod
+
+minikube service hello-minikube --url
+
+# Get files
+https://hub.com/jleetutorial/dockerapp.git/
+  
+# How to Install kubectl and minikube on  Linux: 
+  
+$curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.23.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+ 
+$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.23.0/minikube-darwin-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+$ minikube start
 kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
 
 kubectl expose deployment hello-minikube --type=NodePort
