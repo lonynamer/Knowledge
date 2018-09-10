@@ -224,32 +224,35 @@ kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/
 https://<master-ip>:<apiserver-port>/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy
 ---
 
-# EXCERCISE > INSTALL 4 REPLICA MONGODB
-# MONGO RUNS ON PORT 27017 and supported by docker.
+### EXCERCISE > INSTALL 4 REPLICA MONGODB
+#### MONGO RUNS ON PORT 27017 and supported by docker.
+```
 kubectl run mongo-exercise-1 --image=mongo --port 27017
 kubectl scale --replicas=4 deployment/mongo-exercise-1
-# You can also install using deployment and service yaml or helm package manager.
+```
+You can also install using deployment and service yaml or helm package manager.
 
-# DNS & SERVICE DISCOVERY
-# Used for decoupling but working together coupling together.independent modules
-# BUILD IN DNS
-# Kubernetes configures kubelets to provide DNS IP to containers to solve DNS Names.
+### DNS & SERVICE DISCOVERY
+Used for decoupling but working together together as independent modules
+#### BUILD IN DNS
+#### Kubernetes configures kubelets to provide DNS IP to containers to solve DNS Names of each other.
 <my-srv-name>.<my-name-space>.svc.cluster.local
-# NAMESPACES, by default everything runs under default cluster, but namespaces can create logical clusters. Used for large clusters or large organizations or departments.
-# It should be configured inside /etc/resolv.conf
 
+### NAMESPACES
+By default everything runs under default cluster, but namespaces can create logical clusters. Used for large clusters or large organizations or departments.
 
-
-# VOLUMES
-# Supports Azzue Disk & File, AWS EBS, Google Persistent Disk
-# SAN/File System/Hardware
-# CephFS, Fiber Channel, GlusterFS, NFS, iSCSI, Local(Not supported in production.)
+### VOLUMES
+#### Supports Azzue Disk & File, AWS EBS, Google Persistent Disk
+#### SAN/File System/Hardware
+#### CephFS, Fiber Channel, GlusterFS, NFS, iSCSI, Local(Not supported in production.)
 spec.volume
 spec.containers.volumeMounts
-PersistentVolume defines & PersistentVolumeClaims the volume to attach to pods by master control. Claim means, pods looking for selected storage, else returns errors.
-
-$ kubectl get persistentvolume
-
+PersistentVolume defines & PersistentVolumeClaims the volume to attach to pods by master control. 
+Claim means, pods looking for selected storage, else returns errors.
+```
+kubectl get persistentvolume
+```
+```
 -----------------
 # Volume Configuration Separate
 apiVersion: v1
@@ -283,6 +286,8 @@ spec:
     requests:
       storage: 20Gi
 -------------------
+```
+```
 # deployment configuration
 
 template:
@@ -295,13 +300,15 @@ template:
     - name: wordpress-persistent-storage
       persistentVolumeClaims:
         claimName: wp-pv-claim  
+```
 
-Section 5 Lecture 50
-# Base64 encoded key value pairs to keep human readable data like password, keys to keep to use inside configuration files. Instead of human reabable, It will be a non-human readable hash.
-
+### Base64 encoded key value pairs
+To keep human readable data like password, keys to keep to use inside configuration files. Instead of human reabable, It will be a non-human readable hash.
+```
 kubectl create secret generic mysql-pass --from-literal=password=MY_PASSWORD
 kubecat create secret generic mysql-pass --from-file=./username.txt --from-file=./password.txt
-
+```
+```
 spec:
   containers:
     env:
@@ -320,34 +327,18 @@ volumes:
 - name: secret-storage
   secret:
     secretName: mysql-pass
+```
 
-Section 5 Lecture 52 Usage and Resource Monitoring
-Heap, InfluxDB, Grafana
+###Usage and Resource Monitoring
+You can install tools like Heap, InfluxDB, Grafana, Prometeus for monitoring. 
+- Heapster: Container Cluster Monitoring maintained by CNCF. 
+- Prometeus is a good solution for monitoring. 
 
-- Volume Section 5 - 47 install wordpress with EBS.
-- Connect AWS LoadBalancer.
-- How to install multiple masters.
-- Kops and Kubespray. Elad told to use to install.
-- What is Base 64
-
-Heapster: Container Cluster Monitoring maintained by CNCF
-
-# Open in Git Copy Paste Code
-# https://github.com/kubernetes/heapster/edit/master/deploy/kube-config/influxdb/heapster.yaml
-
-# KubernetesDashboard Installation
-# https://github.com/kubernetes/dashboard/wiki/Installation
-
-There is info on our wiki pages that in order to be able to log in you need to access Dashboard over HTTPS. Frontend will not allow to log in if current domain does not use HTTPS.
-
-As for the alternate version everything works as intended. Starting from K8S 1.7 (if I remember correctly) default permissions are very limited. You would need to grant Dashboard manually more permissions, i.e. by creating ClusterRoleBinding with cluster-admin ClusterRole for kubernetes-dashboard SA.
-# Dashboard.
-
-# Section 5 Lecrute 54 Namespace & Resource Quotas
-# Name object of any type is possible for teams not to fight so namespaces are used.
-# default is fine but example you can create namespace per team, organisations, staging, production.
-# You can limit Compute, Storage, Memory, Number of Objects on NameSpace by ResourceQuotas
-
+### Namespace & Resource Quotas
+Name object of any type is possible for teams not to fight so namespaces are used.
+Default is fine but example you can create namespace per team, groups under organisations, staging, production.
+ You can limit Compute, Storage, Memory, Number of Objects on NameSpace by ResourceQuotas
+```
 apiVersion: v1
 metada:
   name: compute-resources
@@ -358,14 +349,19 @@ spec:
     requests.memory: "1Gi" # max to request per name space
     limits.cpu: "2"  # cannot exceed somehow per name 
     limits.memory: 2Gi  # cannot exceed somehow
-
+```
+```
 $ kubectl create namespace test_namespace
 $ kubectl get namespace
-
-# Create a NameSpace
-$ kubectl create namespace cpu-limited-tomcat
-
-$ vi cpu-limited-tomcat
+```
+#### Create a NameSpace
+```
+kubectl create namespace cpu-limited-tomcat
+```
+```
+vi cpu-limited-tomcat
+```
+```
 #
 apiVersion: v1
 kind: ResourceQuota
@@ -394,88 +390,93 @@ spec.template.spec.containers:
   resources:
     requests:
       cpu: "200m"
+```
+- Kubernetes will not let to deploy or will apply the minimum available if you limit workspace with less quota than resource requested by deployment.
+- In trouble shouting, it's important if 3 replicas cannot be created by limits, how many replicaes will create.
 
-# Kubernetes will not let to deploy or will apply the minimum available if you limit workspace with less quota than resource requested by deployment.
 
-# In trouble shouting, it's important if 3 replicas cannot be created by limits, how many replicaes will create.
-
-
-Section 5 - Lecture 56 - Auto Scaling
-# HPA - Horizontal Pod Autoscaler will create or remove pods according to maintain avarage CPU utilization accross the pods.
-
-# Example % 50 CPU utilization per pod avarage of % 50 per Pod.
-
+### Auto Scaling
+- HPA - Horizontal Pod Autoscaler will create or remove pods according to maintain avarage CPU utilization accross the pods.
+- Example % 50 CPU utilization per pod avarage of % 50 per Pod.
+```
 $ kubectl autoscake deployment wordpress --cpu-percent=50 --min=1 --max=10
-
-# Create a load generator for testing
+```
+Create a load generator for testing
+```
 $ kubectl run -i --tty load-generator --image=busybox /bin/sh
-# Creating load
-$ while true; do wget -q -O-http://wordpress.default.svc.cluster.local; done
-# Get HPA
+```
+Creating load
+```
+while true; do wget -q -O-http://wordpress.default.svc.cluster.local; done
+```
+Get HPA
+```
 $ kubectl get hpa
-
-# Autoscaling Commands
-# since the latest minikube doesn't enable metrics-server by default
+```
+#### Autoscaling Commands
+Since the latest minikube doesn't enable metrics-server by default
 minikube addons enable metrics-server  
- 
+```
 $ kubectl apply -f ./wordpress-deployment.yaml
+```
+```
 $ kubectl autoscale deployment wordpress --cpu-percent=50 --min=1 --max=5
-
+```
 (In the other terminal)
-$ kubectl run -i --tty load-generator --image=busybox /bin/sh
-$ while true; do wget -q -O- http://wordpress.default.svc.cluster.local; done
+```
+kubectl run -i --tty load-generator --image=busybox /bin/sh
+while true; do wget -q -O- http://wordpress.default.svc.cluster.local; done
+```
 (In the first terminal)
+```
 $ kubectl get hpa 
+```
 
-# Section 5 Lecture 58 Auditing.
-# https://kubernetes.io/docs/tasks/debug-application-cluster/audit/
-# Auditing means recording who does what, when and why provides security-relevant chronological set of records. ?
-# 2 type of auditing Legacy and Advances
-# Consider Advanced Auditing.
-# kube-apiserver performs auditing according to Audit Policy and send records to the Audit Backend.
-# It's defined on kube-apiserver by yaml file.
-# Logs are in json format.
-# Audit policy defines what should be logged and nearly anything can be logged.
-
-Backend Types:
+### Auditing.
+---
+https://kubernetes.io/docs/tasks/debug-application-cluster/audit/
+- Auditing means recording who does what, when and why provides security-relevant chronological set of records.
+- 2 type of auditing Legacy and Advanced
+- Consider Advanced Auditing.
+- kube-apiserver performs auditing according to Audit Policy and send records to the Audit Backend.
+- It's defined on kube-apiserver by yaml file.
+- Logs are in json format.
+- Audit policy defines what should be logged and nearly anything can be logged.
+####Backend Types:
 - Logs - Save to external storage.
 - Webhooks - sends events to an external API/system.
-
+---
+Audit Yaml Example
+```
 $ vi audit-policy.yaml
 apiVersion: audit.k8s.io/v1beta1
 kind: Policy
 rules:
 - level: Metadata
-
-# Enabling Auditing in Minicube
+```
+#### Enabling Auditing in Minicube
 minikube start  --extra-config=apiserver.Authorization.Mode=RBAC --extra-config=apiserver.Audit.LogOptions.Path=/var/logs/audit.log   --extra-config=apiserver.Audit.PolicyFile=/etc/kubernetes/addons/audit-policy.yam
-
-# Metadata Better View
+#### Metadata Better View
 # jq command to manipulate json data for better formatting.
+```
 $ cat audit.log | jq . 
-
-# Section 5 Lecture Auto-Scaling and Resources
-# Example install highly scalable ghost, create a persistent volume. 
+```
  
-# Section 6 Lecture 60 High Availability
+### High Availability
 OnMaster > kube-apiserver : kube-controller-manager : kube-scheduler + etcd (key value pair configuration)
-
-# On production to provide HA:  
-# - put etcd on redundant storage.
-# - kube-api replicated load balanced.
-# - master-elected kube-control-manager kube scheduler daemons.
-# - Multiple worker nodes
-
-# Tools: Kops to do this.
+#### On production to provide HA:  
+- put etcd on redundant storage.
+- kube-api replicated load balanced.
+- master-elected kube-control-manager kube scheduler daemons.
+- Multiple worker nodes
+- Separate independent Linux machines and run kubelet and monit
+####Tools: Kops to do this.
 kubectl(clients)>Load Balancer> Master Nodes(etcd,apiserver,scheduler,controller manager, podmaster, kubelet, monit)
-
-# Separate independent Linux machines and run kubelet and monit
-
-# Steps for HA
-# - Reliable Data Storage Layer and running etcd on each masted node.
-# - replicated api servers behind load balancers
-# - ensure only one actor works on the data at a given time, ech scheduler and controller will be started with a --leader-elect flag that will use lease-lock API between themselves to ensure one instance of each is running at a given time. 
-# if one node fails, request will go to another.
+#### Steps for HA
+- Reliable Data Storage Layer and running etcd on each masted node.
+- replicated api servers behind load balancers
+- ensure only one actor works on the data at a given time, each scheduler and controller will be started with a --leader-elect flag that will use lease-lock API between themselves to ensure one instance of each is running at a given time. 
+- if one node fails, request will go to another.
 
 # Section 6, Lecture 62 - Masters - Build a cluster on AWS
 # https://github.com/kubernetes/kops/
