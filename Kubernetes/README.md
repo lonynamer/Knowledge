@@ -6,6 +6,14 @@ https://kubernetes.io/docs/
 - Kubernetes Course File
 https://github.com/jleetutorial/kuburnetes-demo
 ---
+### CHEAT SHEAT REFERENCE
+---
+https://kubernetes.io/docs/reference/kubectl/userguide/
+https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+---
+### 
+
+###
 ### Clients
 ---
 - `kubectl` is the client commands tool.
@@ -133,11 +141,6 @@ kubectl label pod tomcat-deployment-794dbf9966-7lmtq healthy=false
 ### Running an image
 kubernetes-demo$ kubectl run hazelcast --image=hazelcast --port=5701
 
-### CHEAT SHEAT REFERENCE
----
-https://kubernetes.io/docs/reference/kubectl/userguide/
-https://kubernetes.io/docs/reference/kubectl/cheatsheet/
----
 ### Architecture:
 - Client > Master (API, Scheduler, Controller, ETCD) > Node (Kubelet(Runs pods)+Kube-Proxy(Glue for networking between pods), Pod, Docker) 
 - Both Masters and Nodes behind Service Loadbalancer.
@@ -146,12 +149,53 @@ https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 - Stateful
 - Stateless. It's important for scaling
 ### SCALING DEFINITIONS TO SCALE
-- replica
+- Replica
 - ReplicaSet
 - BarePods
 - Jobs
 - Daemon Sets
-
+###
+#### Replica and Replica Set Yaml Example
+```
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replicas according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+    matchExpressions:
+      - {key: tier, operator: In, values: [frontend]}
+  template:
+    metadata:
+      labels:
+        app: guestbook
+        tier: frontend
+    spec:
+      containers:
+      - name: php-redis
+        image: gcr.io/google_samples/gb-frontend:v3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+          # If your cluster config does not include a dns service, then to
+          # instead access environment variables to find service host
+          # info, comment out the 'value: dns' line above, and uncomment the
+          # line below.
+          # value: env
+        ports:
+        - containerPort: 80
+```
 # CLUSTER INFO
  kubectl cluster-info
 
