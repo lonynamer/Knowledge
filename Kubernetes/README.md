@@ -237,7 +237,7 @@ You can also install using deployment and service yaml or helm package manager.
 Used for decoupling but working together together as independent modules
 #### BUILD IN DNS
 #### Kubernetes configures kubelets to provide DNS IP to containers to solve DNS Names of each other.
-<my-srv-name>.<my-name-space>.svc.cluster.local
+`<my-srv-name>.<my-name-space>.svc.cluster.local`
 
 ### NAMESPACES
 By default everything runs under default cluster, but namespaces can create logical clusters. Used for large clusters or large organizations or departments.
