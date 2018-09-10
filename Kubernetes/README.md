@@ -456,8 +456,6 @@ kube-apiserver, kube-controller-manager, kube-scheduler relies on etcd.
 # Installation will be done by Kops
 # Steps
 # Get AWS key.
-Access key ID	AKIAI7WAFOXS4FHVJMYQ
-Secret access key	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
 # - Install Kops on Linux
 $ curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
 $ chmod +x kops-linux-amd64
