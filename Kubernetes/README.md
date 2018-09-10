@@ -176,12 +176,16 @@ or replicas: 2 branch under specs:
 kubectl expose deployment tomcat-deployment --type=LoadBalancer --port=8080 --target-port=8080 --name tomcat-load-balancer
 ```
 ## CREATE, UPDATE, APPLY ROLLING UPDATES, ROLLBACK, PAUSE & RESUME ALL POSSIBLE
+```
 kubectl get deployments
 kubectl rollout status deployment tomcat-deployment
 kubectl set image deployment/tomcat-deployment tomcat=tomcat:9.0.1
 kubectl roleout history deployment/tomcat-deployment
+```
 ### AFTER HISTORY YOU GET REVISION NUMBERS AND CHECK THE CHANGES
+```
 kubectl rollout history deployment/tomcat-deployment --revision=2
+```
 
 ### LABELS AND APPLY
 #### LABEL EXAMPLE ADD INSIDE YAML
