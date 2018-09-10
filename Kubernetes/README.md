@@ -104,43 +104,53 @@ spec:
         ports:
         - containerPort: 8080
 ```
-
-# PORT FORWARDING FOR A SINGLE POD
+### PORT FORWARDING FOR A SINGLE POD
+```
 $ kubectl port-forward tomcat-deployment-794dbf9966-7lmtq 5000:6000
-
-# RUN A COMMAND, MAYBE BASH
- kubectl exec -it tomcat-deployment-794dbf9966-7lmtq bash
-
-# GET THE CONTAINERS IN A POD
-
-# KUBECTL ATTACH
- kubectl attach tomcat-deployment-794dbf9966-7lmtq -c <container>
-
-# LABELING PODS
-# Labeling means giving a key=value
- kubectl label pod tomcat-deployment-794dbf9966-7lmtq healthy=false
-
-# Running an image
+```
+### RUN A COMMAND, MAYBE BASH
+```
+kubectl exec -it tomcat-deployment-794dbf9966-7lmtq bash
+```
+### GET THE CONTAINER'S INFO IN A POD
+To list the containers of a pod the jq query looks like this:
+```
+kubectl get --all-namespaces --selector k8s-app=kube-dns --output json pods | jq --raw-output '.items[].spec.containers[].name'
+```
+If you want to see all details regarding one specific container try something like this:
+```
+kubectl get --all-namespaces --selector k8s-app=kube-dns --output json pods | jq '.items[].spec.containers[] | select(.name=="etcd")'
+```
+### KUBECTL ATTACH
+```
+kubectl attach tomcat-deployment-794dbf9966-7lmtq -c <container>
+```
+### LABELING PODS
+Labeling means giving a key=value
+```
+kubectl label pod tomcat-deployment-794dbf9966-7lmtq healthy=false
+```
+### Running an image
 kubernetes-demo$ kubectl run hazelcast --image=hazelcast --port=5701
 
-# CHEAT SHEAT REFERENCE
+### CHEAT SHEAT REFERENCE
+---
 https://kubernetes.io/docs/reference/kubectl/userguide/
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
-
-# Architecture:
-Client > Master (API, Scheduler, Controller, ETCD) > Node (Kubelet(Runs pods)+Kube-Proxy(Glue for networking between pods), Pod, Docker) > Service Loadbalancer
-
-
-# SCALING APPLICATIONS
-# APPLICATION TYPES
-# - Stateful and Stateless. It's important for scaling
-
-# SCALING DEFINITIONS TO SCALE
-# - replica
-# - ReplicaSet
-# - BarePods
-# - Jobs
-# - Daemon Sets
+---
+### Architecture:
+- Client > Master (API, Scheduler, Controller, ETCD) > Node (Kubelet(Runs pods)+Kube-Proxy(Glue for networking between pods), Pod, Docker) 
+- Both Masters and Nodes behind Service Loadbalancer.
+### SCALING APPLICATIONS
+#### APPLICATION TYPES
+- Stateful
+- Stateless. It's important for scaling
+### SCALING DEFINITIONS TO SCALE
+- replica
+- ReplicaSet
+- BarePods
+- Jobs
+- Daemon Sets
 
 # CLUSTER INFO
  kubectl cluster-info
