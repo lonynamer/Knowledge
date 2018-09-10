@@ -1,4 +1,5 @@
 ## Kubernetes Knowledge
+Kubernetes is an open-source, self-healing, auto-scaling container orchestration solution. 
 ### Kubernetes General Documentation & References
 ---
 - Kubernetes Docs
@@ -462,7 +463,7 @@ minikube start  --extra-config=apiserver.Authorization.Mode=RBAC --extra-config=
 $ cat audit.log | jq . 
 ```
  
-### High Availability
+### High Availability For Deployments
 OnMaster > kube-apiserver : kube-controller-manager : kube-scheduler + etcd (key value pair configuration)
 #### On production to provide HA:  
 - put etcd on redundant storage.
@@ -470,99 +471,112 @@ OnMaster > kube-apiserver : kube-controller-manager : kube-scheduler + etcd (key
 - master-elected kube-control-manager kube scheduler daemons.
 - Multiple worker nodes
 - Separate independent Linux machines and run kubelet and monit
-####Tools: Kops to do this.
+####Tools: Kops.
 kubectl(clients)>Load Balancer> Master Nodes(etcd,apiserver,scheduler,controller manager, podmaster, kubelet, monit)
 #### Steps for HA
 - Reliable Data Storage Layer and running etcd on each masted node.
-- replicated api servers behind load balancers
-- ensure only one actor works on the data at a given time, each scheduler and controller will be started with a --leader-elect flag that will use lease-lock API between themselves to ensure one instance of each is running at a given time. 
-- if one node fails, request will go to another.
-
-# Section 6, Lecture 62 - Masters - Build a cluster on AWS
-# https://github.com/kubernetes/kops/
-kube-apiserver, kube-controller-manager, kube-scheduler relies on etcd. 
-# Installation will be done by Kops
-# Steps
-# Get AWS key.
-# - Install Kops on Linux
-$ curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
-$ chmod +x kops-linux-amd64
-$ sudo mv kops-linux-amd64 /usr/local/bin/kops
-# Install kubectl
-$ wget -O kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-$ chmod +x ./kubectl
-$ sudo mv ./kubectl /usr/local/bin/kubectl
-# - Install awscli 
-# - Search documentation for aws command line tool suite if installing on AWS and ubuntu. 
-# Python is dependency.
-$ curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-$ sudo python3 ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-# - Configure for access, access keys and region
-$ aws configure
-# Create a bucket by awscli
-# aws s3api create-bucket --bucket kube-lony-test --region eu-central-1 --create-bucket-configuration LocationConstraint=eu-central-1
-# "Location": "http://kube-lony-test.s3.amazonaws.com/"
-# Set Environment Variables for installation 
-$ export KOPS_STATE_STORE=s3://kube-lony-test
-# Create public private keys, cluster creation requires
-$ ssh-keygen
-# Create the cluster
-$ kops create cluster kube-lony-cluster.k8s.local --zone eu-central-1b --yes
+- Replicated api servers behind load balancers
+- Ensure only one actor works on the data at a given time, each scheduler and controller will be started with a --leader-elect flag that will use lease-lock API between themselves to ensure one instance of each is running at a given time. 
+- If one node fails, request will go to another.
+### Build a cluster on AWS
+- https://github.com/kubernetes/kops/
+- kube-apiserver, kube-controller-manager, kube-scheduler relies on etcd. 
+- Installation will be done by Kops.
+#### Steps
+- Get AWS key for an admin user.
+- Install Kops on Linux Ubuntu or Centos
+```
+sudo su-
+curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+chmod +x kops-linux-amd64
+sudo mv kops-linux-amd64 /usr/local/bin/kops
+```
+- Install kubectl 
+```
+wget -O kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+```
+- Install awscli 
+  Search documentation for aws command line tool suite installing on AWS and Ubuntu. 
+  Python is dependency.
+```
+curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+sudo python3 ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+```
+- Configure for access, access keys and region
+```
+aws configure
+```
+- Create a bucket by awscli for storing etcd.
+```
+aws s3api create-bucket --bucket kube-lony-test --region eu-central-1 --create-bucket-configuration LocationConstraint=eu-central-1
+```
+"Location": "http://kube-lony-test.s3.amazonaws.com/"
+- Set Environment Variables for installation 
+export KOPS_STATE_STORE=s3://kube-lony-test
+- Create public private keys, cluster creation requires for using awscli
+```
+ssh-keygen
+```
+- Create the cluster on Kops
+```
+kops create cluster kube-lony-cluster.k8s.local --zone eu-central-1b --yes
+```
 # Deleting Cluster
+```
 $ kops delete cluster kube-lony-cluster.k8s.local --yes
-# Sugestions after installation, do all of them
-# Suggestions:
-# * Do valide till you see that cluster is ready.
-# * validate cluster: kops validate cluster
-# * list nodes: kubectl get nodes --show-labels
-# * ssh to the master: ssh -i ~/.ssh/id_rsa admin@api.kube-lony-cluster.k8s.local
-# * This will not work, try as below.
-# * ssh ssh -i ~/.ssh/id_rsa admin@ec2-35-157-217-201.eu-central-1.compute.amazonaws.com
-$ sudo ps ax
-$ cat /var/logs/...
-$ docker ps
-$ kubectl get deployments --all-namespaces
-$ kubectl get deployments --namespace=kube-system
-# * the admin user is specific to Debian. If not using Debian please use the appropriate user based on your OS.
-# * read about installing addons at: https://github.com/kubernetes/kops/blob/master/docs/addons.md.
+```
+- Sugestions after installation, do all of them
+---
+    Suggestions:
+   - Do valide till you see that cluster is ready.
+   - validate cluster: 
+```
+kops validate cluster
+```
+   - list nodes: kubectl get nodes --show-labels
+   - ssh to the master: 
+```
+ssh -i ~/.ssh/id_rsa admin@api.kube-lony-cluster.k8s.local
+```
+- This will not work, try as below.
+```
+ssh -i ~/.ssh/id_rsa admin@ec2-35-157-217-201.eu-central-1.compute.amazonaws.com
+sudo ps ax
+cat /var/logs/...
+docker ps
+kubectl get deployments --all-namespaces
+kubectl get deployments --namespace=kube-system
+```
+   - the admin user is specific to Debian. If not using Debian please use the appropriate user based on your OS.
+   - Kubernetes supports addons.
+   - Read about installing addons at: https://github.com/kubernetes/kops/blob/master/docs/addons.md.
 
-Section 6, Lecture 64 - HIGH AVAILABILITY
-# https://medium.com/appvia/extending-your-kubernetes-cluster-into-a-new-aws-availability-zone-with-kops-127ead8b31bc
+### HIGH AVAILABILITY FOR MASTERS
+- In the previous example, we created high availability for our deployments. What if master fails ?
+- You cannot manage your cluster.
+- https://medium.com/appvia/extending-your-kubernetes-cluster-into-a-new-aws-availability-zone-with-kops-127ead8b31bc
 
 Best Practice:
 - Creating odd number of masters, minimum 3 
 - Creating the masters in different zones.
-$ aws s3api create-bucket --bucket kube-lony-test --region eu-central-1 --create-bucket-configuration LocationConstraint=eu-central-1
-
-$ export KOPS_STATE_STORE=s3://kube-lony-test
-
-$ kops create cluster kube-lony-cluster.k8s.local --zone eu-central-1b,eu-central-1a,eu-central-1c --node-count 3 --master-zones eu-central-1b,eu-central-1a,eu-central-1c --yes
-
+```
+aws s3api create-bucket --bucket kube-lony-test --region eu-central-1 --create-bucket-configuration LocationConstraint=eu-central-1
+export KOPS_STATE_STORE=s3://kube-lony-test
+kops create cluster kube-lony-cluster.k8s.local --zone eu-central-1b,eu-central-1a,eu-central-1c --node-count 3 --master-zones eu-central-1b,eu-central-1a,eu-central-1c --yes
+```
+Deploying our services onto our cluster
+```
 $ kubectl apply -f ./wordpress-deployment.yaml
 $ kubectl apply -f ./mysql-deployment.yaml
 $ kubectl get deployments
 $ kubectl get pods
 $ kubectl describe pods
+```
 
-
-# Section 6 Lecture 65 - Volumes on AWS
-# - Auto provisioner for dynamicly provisioned volumes. You don't need to create volumes they are auto provisioned, you only create volume claim and it's handled automatically. 
-# - Auto provisioning supported platforms. You can change default storage classes.
-# https://kubernetes.io/blog/2017/03/dynamic-provisioning-and-storage-classes-kubernetes/
-
------
-
-- What is kubectl create --save-config -f tomcat-deploymeny.yaml  ?
-- If Kubedns is not configured under /etc/resolv.conf, what we do ?
-- Kops cluster with yaml and more details.
-
-
-
-
-
-
-
-
-
-
+#### Volumes on AWS
+- Auto provisioner for dynamicly provisioned volumes. You don't need to create volumes they are auto provisioned, you only create volume claim and it's handled automatically. 
+- Auto provisioning supported platforms. You can change default storage classes.
+- https://kubernetes.io/blog/2017/03/dynamic-provisioning-and-storage-classes-kubernetes/
 
