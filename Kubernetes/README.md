@@ -11,8 +11,15 @@ https://github.com/jleetutorial/kuburnetes-demo
 ---
 https://kubernetes.io/docs/reference/kubectl/userguide/
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+https://kubernetes.io/docs/concepts/services-networking/service/
+https://kubernetes.io/docs/concepts/architecture/master-node-communication/
+https://stackoverflow.com/questions/39293441/needed-ports-for-kubernetes-cluster
 ---
 ### 
+
+### KUBERNETES CODE GENERATOR
+
+###
 
 ###
 ### Clients
