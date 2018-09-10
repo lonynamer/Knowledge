@@ -148,88 +148,55 @@ kubernetes-demo$ kubectl run hazelcast --image=hazelcast --port=5701
 #### APPLICATION TYPES
 - Stateful
 - Stateless. It's important for scaling
-### SCALING DEFINITIONS TO SCALE
-- Replica
-- ReplicaSet
-- BarePods
-- Jobs
-- Daemon Sets
-###
-#### Replica and Replica Set Yaml Example
-```
-apiVersion: apps/v1
-kind: ReplicaSet
-metadata:
-  name: frontend
-  labels:
-    app: guestbook
-    tier: frontend
-spec:
-  # modify replicas according to your case
-  replicas: 3
-  selector:
-    matchLabels:
-      tier: frontend
-    matchExpressions:
-      - {key: tier, operator: In, values: [frontend]}
-  template:
-    metadata:
-      labels:
-        app: guestbook
-        tier: frontend
-    spec:
-      containers:
-      - name: php-redis
-        image: gcr.io/google_samples/gb-frontend:v3
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        env:
-        - name: GET_HOSTS_FROM
-          value: dns
-          # If your cluster config does not include a dns service, then to
-          # instead access environment variables to find service host
-          # info, comment out the 'value: dns' line above, and uncomment the
-          # line below.
-          # value: env
-        ports:
-        - containerPort: 80
-```
-# CLUSTER INFO
+#### SCALING DEFINITIONS TO SCALE
+---
+- Replica: 
+- ReplicaSet: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+- BarePods: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/
+- Jobs: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
+- Daemon Sets: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/
+- In general `Deployments` object is used for scaling. Work with `Deployments`
+https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+---
+#### CLUSTER INFO
  kubectl cluster-info
 
-# REPLICA
+#### REPLICA - Replicate already created deployment. 
+```
 kubectl scale --replicas=4 deployment/tomcat-deployment
 kubectl get deployment
 kubectl describe deployment
-# or replicas: 2 branch under specs:
-
-# LOAD BALANCER
+```
+---
+or replicas: 2 branch under specs:
+---
+#### LOAD BALANCER
+```
 kubectl expose deployment tomcat-deployment --type=LoadBalancer --port=8080 --target-port=8080 --name tomcat-load-balancer
-
-
-# CREATE, UPDATE, APPLY ROLLING UPDATES, ROLLBACK, PAUSE & RESUME ALL POSSIBLE
+```
+## CREATE, UPDATE, APPLY ROLLING UPDATES, ROLLBACK, PAUSE & RESUME ALL POSSIBLE
 kubectl get deployments
 kubectl rollout status deployment tomcat-deployment
 kubectl set image deployment/tomcat-deployment tomcat=tomcat:9.0.1
 kubectl roleout history deployment/tomcat-deployment
-# AFTER HISTORY YOU GET REVISION NUMBERS AND CHECK THE CHANGES
+### AFTER HISTORY YOU GET REVISION NUMBERS AND CHECK THE CHANGES
 kubectl rollout history deployment/tomcat-deployment --revision=2
 
-# LABELS AND APPLY
-# LABEL EXAMPLE ADD INSIDE YAML
+### LABELS AND APPLY
+#### LABEL EXAMPLE ADD INSIDE YAML
 template: > spec: > nodeSelector: > storageType: ssd
-# AND RUN COMMAND
+#### AND RUN COMMAND
+Example: the deployment only work on storageType=ssd labeled machines.
+```
 kubectl apply -f tomcat-deploy.yml
 kubectl label node ip-172-31-42-57 storageType=ssd
-# the deployment only work on storageType=ssd labeled machines.
+```
 
-
-# HEALT CHECK
-# - READINESS(If it came up), LIVENESS(If it's working) 
-# You can check by running command or tcp,http request.
-# spec: > template: > spec: > container:
+### HEALT CHECK
+- READINESS(If it came up)
+- LIVENESS(If it's working) 
+#### spec: > template: > spec: > container:
+```
 livenessProbe:
   httpGet:
     path: /
@@ -242,14 +209,20 @@ readinessProbe:
     port: 8080
   initialDelaySeconds: 30  # Period to fail
   periodSeconds: 30         # Period
-
-# KUBE WEB UI > Runs on Master
-# You can do the things in KUBE WEB UI as well
-# Documentation
-# https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
+```
+### KUBE WEB UI > Runs on Master
+#### You can do the things in KUBE WEB UI as well
+#### Documentation
+---
+https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
+---
+```
 kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
-# ACCESSING WEB UI
+```
+#### ACCESSING WEB UI
+---
 https://<master-ip>:<apiserver-port>/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy
+---
 
 # EXCERCISE > INSTALL 4 REPLICA MONGODB
 # MONGO RUNS ON PORT 27017 and supported by docker.
