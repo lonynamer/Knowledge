@@ -18,7 +18,7 @@ https://stackoverflow.com/questions/39293441/needed-ports-for-kubernetes-cluster
 ### 
 
 ### KUBERNETES CODE GENERATOR
-
+https://github.com/kubernetes/code-generator
 ###
 
 ###
@@ -585,9 +585,20 @@ $ kubectl get deployments
 $ kubectl get pods
 $ kubectl describe pods
 ```
-
 #### Volumes on AWS
 - Auto provisioner for dynamicly provisioned volumes. You don't need to create volumes they are auto provisioned, you only create volume claim and it's handled automatically. 
 - Auto provisioning supported platforms. You can change default storage classes.
 - https://kubernetes.io/blog/2017/03/dynamic-provisioning-and-storage-classes-kubernetes/
+
+
+#### INSTALLATION OPTIONS
+- https://kubernetes.io/docs/setup/pick-right-solution/
+#### INSTALLATION BY KUBESPRAY
+- https://github.com/kubernetes-incubator/kubespray
+#### INSTALLATION BY CONJURE AND JUJU
+- https://kubernetes.io/docs/getting-started-guides/ubuntu/
+#### INSTALLATION BY KUBEADM
+- https://kubernetes.io/docs/setup/independent/install-kubeadm/
+#### INSTALLATION MANUALLY ON BAREMETAL
+- https://severalnines.com/blog/installing-kubernetes-cluster-minions-centos7-manage-pods-services
 
