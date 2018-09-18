@@ -719,7 +719,9 @@ $ cat playbooks/stack_restart.yml
         - python-httplib2
 ```
 Add python_httplib2 to control nodes to loadbalancers
+```
 $ cat playbooks/loadbalancer.yml
+
 - hosts: loadbalancers
   become: true
   tasks: 
@@ -752,7 +754,9 @@ $ cat playbooks/loadbalancer.yml
 
 Add python_httplib2 to control nodes
 ```
+```
 $ cat playbooks/control.yml
+
 ---
 - hosts: control
   become: true
@@ -763,7 +767,7 @@ $ cat playbooks/control.yml
         - curl
         - python_httplib2
 ```
-
+Add to playbooks/stack_status.yml
 ```
 # for loadbalancers response
 - hosts: control
@@ -883,9 +887,11 @@ $ cat playbooks/stack_status.yml
 ```
 
 ### Roles
+---
 - Module Roles is like functions to define objects like files, handlers, tasks, template for using tasks.
 - https://docs.ansible.com/ansible/playbooks_roles.html
-- First create a folder called roles
+- First create a folder called roles initialize a role for each tier.
+---
 ```
 ansible container init  # inits the main foldes to work with ansible.
 ansible-galaxy init control # inits roles under the container.
@@ -896,13 +902,14 @@ ansible-galaxy init mysql
 ```
 
 ### Ansible galaxy
+---
 Above created roles with ansible-galaxy commands by our selves.
 There is ansibe galaxy site which you can install pre-defined roles.
 You can register, create and push your own roles galaxy site.
 - https://galaxy.ansible.com/
 How To:
 - https://docs.ansible.com/ansible/latest/reference_appendices/galaxy.html
-
+---
 ```
 # Example Galaxy Commands
 # You can use inside yaml as well.
@@ -916,6 +923,7 @@ $ ansible-galaxy install -r requirments.yml
 ```
 # For control nodes
 $ cat roles/control/tasks/main.yml
+
 ---
     - name: install tools
       apt: name={{item}} state=present update_cache=yes
@@ -926,10 +934,13 @@ $ cat roles/control/tasks/main.yml
 ```
 # For control nodes
 $ cat playbooks/control.yml
+
+---
 - hosts: control
   become: true
   roles:
     - control
+```
 ```
 # for databases
 - hosts: databases
@@ -940,6 +951,7 @@ $ cat playbooks/control.yml
 ```
 # for databases, tasks
 $ cat roles/mysql/tasks/main.yml
+
 ---
     - name: install mysql
       apt: name={{item}} state=present update_cache=yes
@@ -972,6 +984,8 @@ $ cat roles/mysql/handlers/main.yml
 #### NGINX
 ```
 $ cp template/nginx.conf.j2 roles/nginx/templates/
+```
+```
 $ cat roles/nginx/templates/nginx.conf.j2
 
 # Jinja format loop upstream
@@ -990,6 +1004,7 @@ server {
 ```
 ```
 $ cat playbooks/loadbalancer.yml
+
 ---
 - hosts: loadbalancers
   become: true
@@ -1038,7 +1053,6 @@ $ cat roles/nginx/handlers/main.yml
 ```
 $ cat playbooks/webserver.yml
 
----
 - hosts: webserver
   become: true
   roles:
@@ -1050,99 +1064,66 @@ $ cat playbooks/webserver.yml
 $ cat roles/apache2/tasks/main.yml
 
 ---
-
 - name: install web components
-
   apt: name={{item}} state=present update_cache=yes
     with_items:
-
     - apache2
-
     - libapache2-mod-wsgi
 
-
-
 - name: ensure mod_wsgi enabled
-
   apache2_module: state=present name=wsgi
-
   notify: restart apache2
 
-
-
 - name: de-activate default apache site
-
   file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
   notify: restart apache2
 
-
-
 - name: ensure apache2 started
-
   service: name=apache2 state=started enabled=yes
-
 ```
-
-
 ```
 $ cat roles/demo_app/tasks/main.yml
 
+---
 - name: install web components
-  
   apt: name={{item}} state=present update_cache=yes
-  
   with_items:
-    
   - python-pip
-    
   - python-virtualenv
-    
   - python-mysqldb
 
-
-- name: copy demo app source
-  
+- name: copy demo app source  
   copy: src=demo/app/ dest=/var/www/demo mode=0755
-
   notify: restart apache2
 
-
-
-- name: copy apache virtual host config
-  
+- name: copy apache virtual host config  
   copy: src=demo/demo.conf dest=/etc/apache2/sites-available mode=0755
-  
   notify: restart apache2
-
-- name: setup python virtualenv
-
 
 - name: setup python virtualenv
   pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo/.venv
         notify: restart apache2
 
 - name: activate demo apache site
-
   file: src=/etc/apache2/sites-available/demo.conf dest=/etc/apache2/sites-enabled/demo.conf state=link
   notify: restart apache2
   notify: restart apache2
 ```
+
+### NOTES: From this point no configuration will not be printed fully. All are just sample blocks.
+
 ```
 $ cat roles/demo_app/handlers/main.yml
 
 ---
- 
 name: restart apache2
-  
      service: name=apache2 state=restarted
 ```
-
----
+```
 $ cat roles/apache2/handlers/main.yml
 
- 
+---
 name: restart apache2
-  
      service: name=apache2 state=restarted
 ```
 
@@ -1158,7 +1139,6 @@ cat roles/site.yml
 - include: loadbalancer.yml
 ```
 
-
 ### Variable: facts
 Gathering facts and variables.
 This will print all the information related to server in json format.
@@ -1166,13 +1146,23 @@ This will print all the information related to server in json format.
 ansible -m setup db01
 ```
 A section from roles/mysql/main.yml. Using variable from facts inside yaml to change bind ip in my.cnf conf to our ip. As an example mysql database ip address always changing.
-
+```
+# Add to playbooks/mysql.yml
+- hosts: webservers
+  gather_facts: false
+```
+```
+# Add to playbooks/stack_status.yml
+- hosts: webservers
+  gather_facts: false
+```
 ```
 $ cat roles/mysql/site.yml
 
 - name: ensure mysql listening on all ports
   lineinfile: dest=/etc/mysql/my.cnf regexp=^bind-address
               line="bind-address = {{ ansible_eth0.ip4.address }}"
+```
 ```
 $ cat playbooks/stack_restart.yml
 
@@ -1181,9 +1171,8 @@ $ cat playbooks/stack_restart.yml
 ```
 
 ### Variables: defaults
-
 ```
-$ cat roles/mysql/main.ym;
+$ cat roles/mysql/main.yml;
 
 - name: create database
   mysql_db: name={{ db_name }} state=present
@@ -1203,17 +1192,18 @@ db_user_host: local
 ```
 
 ### Variables vars
+---
 The previous were defaults specific to app. Use defaults.
 And it's the good practice using vars and keeping.
 - https://docs.ansible.com/ansible/2.6/user_guide/playbooks_variables.html
-
+---
 ```
 $ cat roles/mysql/vars/main.yml
 ```
-
+---
 You can set vars everywhere and ansible has an hierarchical over-riding variables. Explained here.
 - https://docs.ansible.com/ansible/2.6/user_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
-
+---
 ```
 # From Least To Gratest. extra vars wins because cannot be overridden.
 role defaults [1]
@@ -1239,22 +1229,17 @@ include params
 extra vars (always win precedence)
 ```
 
-Overriding/injecting when calling a role
+Overriding/injecting variables when calling a role
 ```
+$ cat database.yml 
+
 ---
-
 - hosts: database
-
   become: true
-
   roles:
-
     - role: mysql
-
       db_user_name: "{{ db_user }}"
-
       db_user_pass: "{{ db_pass }}"
-
       db_user_host: '%'
 ```
 
@@ -1275,19 +1260,7 @@ sites:
     frontend: 80
     backend: 80
 ```
-
 ```
-
-$ cat roles/nginx/tasks/main.yml
-- name: configure nginx site
-  template: src:nginx.conf.j2 dest=/etc/nginx/sites-available/demo mode=0644
-  with_dict: sites
-  notify: restart nginx
-```
-
-```
-$ cat roles/nginx/templates/nginx.conf.j2
-
 - name: configure nginx sites
   template: src=nginx.conf.j2 dest=/etc/nginx/sites-available/{{ item.key }} mode=0644
   with_dict: sites
@@ -1297,10 +1270,10 @@ $ cat roles/nginx/templates/nginx.conf.j2
   file: src=/etc/nginx/sites-available/{{ item.key }} dest=/etc/nginx/sites-enabled/{{ item.key }} state=link
   with_dict: sites
   notify: restart nginx
-
 ```
-
 ```
+$ cat roles/nginx/templates/nginx.conf.j2
+
 upstream {{ item.key }} {
 {% for server in groups.webserver %}
     server {{ server }}:{{ item.value.backend }};
@@ -1317,10 +1290,11 @@ server {
 ```
 
 ### Selective Removal: shell, register, with_items, Example:
+---
 - ls files inenabled-sites dir and save as variable active
 - run a loop for each value in active variable
 - when there is not a key in sites list, delete the file from configuration directory available sites
-
+---
 ```
 $ cat roles/nginx/defaults/main.yml
 
@@ -1330,7 +1304,6 @@ sites:
     frontend: 80
     backend: 80
 ```
-
 ```
 $ cat roles/nginx/tasks/main.yml
 
@@ -1345,11 +1318,11 @@ $ cat roles/nginx/tasks/main.yml
   notify: restart nginx
 ```
 
-
 ### Variables - continued
+---
 Example: We have a python db connection jinja2 template
 - What we do is. We have variables. Calling the role by variables, so it's injecting  variables to the template while creating it.
-
+---
 ```
 activate_this = '/var/www/demo/.venv/bin/activate_this.py'
 execfile(activate_this, dict(__file__=activate_this))
@@ -1362,7 +1335,6 @@ sys.path.insert(0, '/var/www/demo')
 
 from demo import app as application
 ```
-
 ```
 $ cat webserver.yml
 
@@ -1374,12 +1346,12 @@ $ cat webserver.yml
     - { role: demo_app, db_user: demo, db_pass: demo, db_name: demo }
 ```
 
-
-
 ### Variables; vars_files, group_vars
+---
 Those are the locations where all playbooks and playbooks uses without adding to ansible.cfg. Default locations. Good way to hold varibles in a central location.
 - https://docs.ansible.com/ansible/intro_inventory.html#splitting-out-host-and-group-specific-data
 - https://docs.ansible.com/ansible/playbooks_variables.html#variable-file-separation
+---
 
 Create directories
 ```
@@ -1396,7 +1368,7 @@ db_name: demo
 db_user: demo
 db_pass: demo
 ```
-Inject to roles
+Inject variables to roles
 ```
 $ cat databases.yml
 ---
@@ -1421,9 +1393,10 @@ $ cat roles/databases/tasks/mysql/main.yml
 ```
 
 ### Variables: vault
+---
 Encrypting clear text for passwords, keys and important data to eliminate passwords inside yaml code.
 - https://docs.ansible.com/ansible/2.6/user_guide/vault.html
-
+---
 ```
 # In the main directory that we are working
 cd group_vars
@@ -1433,8 +1406,6 @@ mv vars all
 export EDITOR=vi
 cd all 
 ```
-
-
 Continuation
 ```
 $ ansible-vault create vault  
@@ -1485,9 +1456,11 @@ Also it covers writing less code.
 time ansible-playbook site.yml
 ```
 
-#### Removing Unnecessary Steps: 
+#### Removing Unnecessary Steps:
+---
 - gather_facts: false
 - In database mysql we don't do false because we are using variables .
+---
 ```
 - hosts: loadbalancer
   gather_facts: false
@@ -1516,15 +1489,19 @@ $ cat site.yml
 ```
 
 #### Limiting Execution by Hosts: limit
+---
 - If you want to do a change in one host inside a site.yml
 - Or did a change only in one tear and you don't want the entires site.yml hosts action will be taken. Only the relevant actions.
+---
 ```
 ansible-playbook site.yml --limit app01   # regex will work as well
 ```
 
 #### Limiting Execution by tags: 
+---
 - Tagging a tasks
 - Additionally you can tag multiple tasks with same tag like system, configure, packages. So when you run ansible-playbook only those tagged tasks will run.
+---
 ```
 $ cat roles/control/tasks/main.yml
 
@@ -1536,7 +1513,6 @@ $ cat roles/control/tasks/main.yml
     - python-httplib2
   tags [ 'packages' ]
 ```
-
 ```
 ansible-playbook site.yml --list-tags
 ```
@@ -1548,11 +1524,12 @@ ansible-playbook site.yml --skip-tags "packages"
 ```
 
 #### Idempotence: when_changed, when_failed
+---
 - changed_when: is used to manipulating changed status with a condition.
 - failed_when: is used to manipulating failed status with a condition.
 - They work use the same login.
 - It effects how the playbook run works.
-
+---
 ```
 # Not from our codes.
 
@@ -1561,14 +1538,12 @@ tasks:
     register: bass_result
     changed_when: "bass_result.rc != 2
 ```
-
 ```
 - name: get active sites
   shell: ls -1 /etc/nginx/sites-enabled
   register: active
   changed_when: "active.stdout_lines != sites.keys()"
 ```
-
 ```
 # Not from our codes.
 # This will never repost changed status
@@ -1581,9 +1556,11 @@ tasks:
 
 ### Accelerated Mode and Pipelining
 #### Accelerated Mode
+---
 - Ansible is a python app which uses ssh. 
 - https://docs.ansible.com/ansible/2.3/playbooks_acceleration.html
 - Not reccommended what it does is keepalive ssh connection.
+---
 ```
 - hosts:
   accelerate: true
@@ -1601,27 +1578,32 @@ vault_password_file = ~/.vault_pass.txt
 [ssh_connection]
 pipelining = True
 ```
+```
 # This make fasters the sudo become opreations
 echo "Defaults	!requiretty" >> /etc/sudoers
 # OR
-visudo 
+visudo
+```
 ```
 echo "Defaults	!requiretty" >> /etc/sudoers
 ```
 
 ### Troubleshooting Ordering Problems
+---
 - As and example you have 2 tasks, first is restart the service and second configure the service.
 - If you do mistake in configuration section, next playbook run new configuration will not load.
 - The next run it will fail to restart, as it fail.
 - You will fix the configuration change, it will not work because service restart is before, due to old configuration, service restart will throw error and configuration change will not work.
+---
 
 #### How to fix this ?
 There are many ways. It depends what to use according to the situation.
-```
+---
 1) Moving the restart task after configuration, which is more logical
 2) # commenting in for only one run the erroring section.
 3) Adding ignore_errors: true to the service restart task
 ignore_errors: true
+---
 
 ### Jumping to Specific Tasks: list-tasks, step, start-at-task
 Cause ansible-playbook command to get interactive y or no approval for each step
@@ -1655,7 +1637,6 @@ ansible-playbook --check site.yml
 
 ### Debugging: debug
 As an example below, debug will print out debug info in the end.
-
 ```
 - name: get active sites
   shell: ls -1 /etc/nginx/sites-enabled
@@ -1666,12 +1647,14 @@ As an example below, debug will print out debug info in the end.
 ```
 
 ### YAML
+---
 YAML is a human frindly data serialization standard for all programming languages. Easier than JSON.
 - http://yaml.org/
 - yaml.org/start.html
 - http://learnxinyminutes.com/docs/yaml/
 - indentations are spaces, data includes key/value pairs and lists.
 - Lists starts with 
+---
 ```
 #### Lists: May be in 2 formats.
 product: [ item1, item2 ]
@@ -1681,6 +1664,7 @@ product:
   - item2
 ```
 #### Block Format 
+Check | in the code to understand block format.
 ```
 address:
   lines: |
@@ -1700,9 +1684,11 @@ ship-to: *id001
 ```
 
 #### Jinja2 Templating Engine
+---
 - http://jinja.pocoo.org/
 - You don't need to be an expert but learn the basics.
 - Whenever you inject a variable, Jinja2 does the subout before.
+---
 ```
 {% extends "layout.html" %}
 {% block body %}
@@ -1712,6 +1698,7 @@ ship-to: *id001
   {% endfor %}
   </ul>
 {% endblock %}
+```
 
 ### Jinja2 From Ansible's Perspective
 #### Template Designer
@@ -1736,6 +1723,7 @@ ship-to: *id001
 </body>
 </html>
 ```
+
 #### Filters
 - http://jinja.pocoo.org/docs/2.10/templates/#filters
 
@@ -1745,6 +1733,3 @@ ship-to: *id001
 #### List of control structures
 - Learn If, Loop structures
 http://jinja.pocoo.org/docs/2.10/templates/#list-of-control-structures
-
-### Dev Environment with Docker
-
