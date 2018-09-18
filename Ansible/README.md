@@ -158,7 +158,7 @@ $ cat playbooks/loadbalancer.yml
     apt: name=nginx state=absent update_cache=yes
 ```
 ```
-$ cat playbooks/database.yml
+$ cat database.yml
 ---
 - hosts: databases
   tasks:
@@ -172,7 +172,7 @@ $ cat playbooks/database.yml
 - As installations should run as root. 
 ---
 ```
-$ cat playbooks/database.yml
+$ cat database.yml
 
 ---
 - hosts: databases
@@ -188,7 +188,7 @@ The second run will fast and will not do nothing because we are in a desired sta
 ```
 ansible-playbook playbooks/database.yml
 ```
-$ cat playbooks/webserver
+$ cat webserver.yml
 ---
 
 ### with_items and {{item}} 
@@ -199,7 +199,7 @@ also apt: module is used, in redhat yum:
 - Jinja is templating language library.
 - http://jinja.pocoo.org/
 ```
-$ cat playbooks/webserver.yml
+$ cat webserver.yml
 
 ---
 - hosts: webservers
@@ -215,12 +215,12 @@ $ cat playbooks/webserver.yml
         - python-mysqldb
 ```
 ```
-ansible-playbook playbooks/database.yml
+ansible-playbook database.yml
 ```
 
 ### Service: servive
 ```
-$ cat playbooks/loadbalancer.yml
+$ cat loadbalancer.yml
 
 ---
 - hosts: loadbalancers
@@ -236,7 +236,7 @@ $ cat playbooks/loadbalancer.yml
 ```
 - On control module where ansible running.
 ```
-$ cat playbooks/loadbalancer.yml
+$ cat loadbalancer.yml
 
 ---
 - hosts: control
@@ -248,7 +248,7 @@ $ cat playbooks/loadbalancer.yml
         - curl
 ```
 ```
-ansible-playbook playbooks/loadbalancer.yml
+ansible-playbook loadbalancer.yml
 ```
 
 ### Stack Restart
@@ -289,7 +289,7 @@ ansible-playbook playbooks/stack_restart.yml
 ### Notify and handlers
 #### Services: apache2_module, handlers, notify
 ```
-$ cat playbooks/webserver.yml
+$ cat webserver.yml
 
 ---
 - hosts: webservers
@@ -316,7 +316,7 @@ $ cat playbooks/webserver.yml
     service: name=apache2 state=restarted
 ```
 ```
-ansible-playbook playbooks/webserver.yml
+ansible-playbook webserver.yml
 ```
 ---
 - If you use service restart, it will restart the service each time playbook is ran even you don't want to and there is no module change. 
@@ -330,7 +330,7 @@ ansible-playbook playbooks/webserver.yml
       notify: restart apache2
 ```
 ```
-$ cat playbooks/webserver.yml
+$ cat webserver.yml
 - hosts: webservers
   become: true
   tasks:
@@ -363,7 +363,7 @@ $ cat playbooks/webserver.yml
     service: name=apache2 state=restarted
 ```
 ```
-ansible-playbook playbooks/webserver.yml
+ansible-playbook webserver.yml
 ```
 
 ### pip module Application Module pip
@@ -377,7 +377,7 @@ $ cat playbooks/control.yml
       notify: restart apache
 ```
 ```
-$ cat playbooks/webserver.yml
+$ cat webserver.yml
 
 ---
 - hosts: webservers
@@ -431,7 +431,7 @@ ansible-playbook playbooks/webserver.yml
       notify: restart apache
 ```
 ```
-$ cat playbooks/webserver.yml
+$ cat webserver.yml
 
 ---
 - hosts: webservers
@@ -478,14 +478,14 @@ $ cat playbooks/webserver.yml
    state=restarted
 ```
 ```
-ansible-playbook playbooks/webserver.yml
+ansible-playbook webserver.yml
 ```
 
 ### Files: template
 $ mkdir template
 
 ```
-$ cat template/nginx.conf.j2
+$ cat roles/nginx/templates/nginx.conf.j2
 
 # Jinja format loop upstream
 upstream demo {
@@ -502,7 +502,7 @@ server {
 }
 ```
 ```
-$ cat playbooks/loadbalancer.yml
+$ cat loadbalancer.yml
 
 ---
 - hosts: loadbalancers
@@ -531,7 +531,7 @@ $ cat playbooks/loadbalancer.yml
       service: name=nginx state=restarted
 ```
 ```
-$ ansible-playbook playbooks/loadbalancer
+$ ansible-playbook loadbalancer.yml
 ```
 
 ### Files: lineinfile
@@ -546,7 +546,7 @@ $ ansible-playbook playbooks/loadbalancer
        service name=mysql state=restarted  
 ```
 ```
-$ cat playbooks/database.yml
+$ cat database.yml
 
 ---
 - hosts: databases
@@ -567,7 +567,7 @@ $ cat playbooks/database.yml
     service name=mysql status=restarted
 ```
 ```
-ansible-playbook playbooks/database.yml
+ansible-playbook database.yml
 ```
 
 ### Application Modules: mysql_db, mysql_user
@@ -580,7 +580,7 @@ ansible-playbook playbooks/database.yml
   mysql_user: name=demo pasword=demo priv=demo.*:ALL
 ```
 ```
-$ cat playbooks/database.yml
+$ cat database.yml
 
 ---
 - hosts: databases
@@ -609,7 +609,7 @@ $ cat playbooks/database.yml
     service name=mysql status=restarted
 ```
 ```
-ansible-playbook playbooks/database.yml
+ansible-playbook database.yml
 ```
 ### Support Playbook 2 - Stack Status: wait_for
 - https://docs.ansible.com/ansible/wait_for_module.html
