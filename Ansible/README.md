@@ -214,8 +214,11 @@ $ cat playbooks/webserver.yml
         - python-virtualenv
         - python-mysqldb
 ```
+```
+ansible-playbook playbooks/database.yml
+```
 
-### Service: serviyumce
+### Service: servive
 ```
 $ cat playbooks/loadbalancer.yml
 
@@ -243,6 +246,9 @@ $ cat playbooks/loadbalancer.yml
       apt: name={{item}} state=present update_cache=yes
       with_items:
         - curl
+```
+```
+ansible-playbook playbooks/loadbalancer.yml
 ```
 
 ### Stack Restart
@@ -276,6 +282,9 @@ $ cat playbooks/stack_restart.yml
   tasks:
     - service: name=apache2 state=started
 ```
+```
+ansible-playbook playbooks/stack_restart.yml
+```
 
 ### Notify and handlers
 #### Services: apache2_module, handlers, notify
@@ -305,6 +314,9 @@ $ cat playbooks/webserver.yml
   handlers:
   - name restart apache
     service: name=apache2 state=restarted
+```
+```
+ansible-playbook playbooks/webserver.yml
 ```
 ---
 - If you use service restart, it will restart the service each time playbook is ran even you don't want to and there is no module change. 
@@ -350,15 +362,24 @@ $ cat playbooks/webserver.yml
   - name restart apache
     service: name=apache2 state=restarted
 ```
+```
+ansible-playbook playbooks/webserver.yml
+```
 
 ### pip module Application Module pip
 - Pip is package management of python, it can create an isolated container, put all python dependencies on it.
+- By default install before ansible 
 ```
+$ cat playbooks/control.yml
+
     - name: setup python virtualenv
       pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/.venv
       notify: restart apache
 ```
+```
 $ cat playbooks/webserver.yml
+
+---
 - hosts: webservers
   become: true
   tasks:
@@ -393,6 +414,10 @@ $ cat playbooks/webserver.yml
   handlers:
   - name restart apache
     service: name=apache2 state=restarted
+```
+```
+ansible-playbook playbooks/webserver.yml
+```
 
 ### File, File
 #### Disable apache default site and enable our new site.
@@ -405,8 +430,10 @@ $ cat playbooks/webserver.yml
       file: src=/etc/apache2/sites-available/demo.conf dest=/etc/apache2/sites-enabled/demo.conf state=link
       notify: restart apache
 ```
-
+```
 $ cat playbooks/webserver.yml
+
+---
 - hosts: webservers
   become: true
   tasks:
@@ -449,11 +476,17 @@ $ cat playbooks/webserver.yml
   handlers:
   - name restart apache
    state=restarted
+```
+```
+ansible-playbook playbooks/webserver.yml
+```
 
 ### Files: template
 $ mkdir template
-$ cat template/nginx.conf.j2
+
 ```
+$ cat template/nginx.conf.j2
+
 # Jinja format loop upstream
 upstream demo {
 {% for server in groups.webservers %}
@@ -468,8 +501,10 @@ server {
   }
 }
 ```
-
+```
 $ cat playbooks/loadbalancer.yml
+
+---
 - hosts: loadbalancers
   become: true
   tasks:
@@ -494,9 +529,10 @@ $ cat playbooks/loadbalancer.yml
   handlers:
     - name: restart nginx
       service: name=nginx state=restarted
-
+```
+```
 $ ansible-playbook playbooks/loadbalancer
-
+```
 
 ### Files: lineinfile
 ### Change configuration inside a file.
@@ -509,6 +545,10 @@ $ ansible-playbook playbooks/loadbalancer
      - name: restart mysql
        service name=mysql state=restarted  
 ```
+```
+$ cat playbooks/database.yml
+
+---
 - hosts: databases
   become: true
   tasks:
@@ -525,6 +565,10 @@ $ ansible-playbook playbooks/loadbalancer
   handlers: 
   - name: restart mysql
     service name=mysql status=restarted
+```
+```
+ansible-playbook playbooks/database.yml
+```
 
 ### Application Modules: mysql_db, mysql_user
 #### Configure mysql user and password.
@@ -535,7 +579,10 @@ $ ansible-playbook playbooks/loadbalancer
 - name create: mysql user
   mysql_user: name=demo pasword=demo priv=demo.*:ALL
 ```
+```
+$ cat playbooks/database.yml
 
+---
 - hosts: databases
   become: true
   tasks:
@@ -560,12 +607,15 @@ $ ansible-playbook playbooks/loadbalancer
   handlers: 
   - name: restart mysql
     service name=mysql status=restarted
-
+```
+```
+ansible-playbook playbooks/database.yml
+```
 ### Support Playbook 2 - Stack Status: wait_for
 - https://docs.ansible.com/ansible/wait_for_module.html
 
 Create stack_status.yml playbook
-```
+
 $ cat playbooks/stack_status.yml
 
 ---
