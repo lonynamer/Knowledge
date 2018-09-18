@@ -27,7 +27,10 @@ ansible —list-hosts
 
 Inventory file location
 Recomendation is keeping in SVC like git, versioning and change control.
-$ cat /etc/ansible/hosts
+You can also create a directory and put inside ansible.cfg file describing hosts inventory location.
+```
+$ cat /etc/ansible/hosts  # Default inventory location defined globally
+
 [loadbalancers]
 lnb1
 lnb2
@@ -41,32 +44,44 @@ httpd2
 
 [databases]
 mysql1
+localhost ansible_connection=local
 
 [control]
 # You can specify connection type, default is ssh, as below you can set as local.
 control ansible_connection=local
+```
 
 You can name the inventory file as dev and call like this.
-$ ansible -i dev --list-hosts all
+```
+ansible -i dev --list-hosts all
+```
 
 You can set as default inventory file as dev.
+```
 $ cat /etc/ansible/ansible.cfg
+
 [defaults]
 inventory=./dev
-
+```
 ### Host Selection
 You can use regex
-$ ansible --list-hosts "*"
-
+```
+ansible --list-hosts "*"
+```
 By group name
-$ ansible --list-hosts loadbalancers
-$ ansible --list-hosts "httpd*"
-$ ansible --list-hosts loadbalancers:lnb1
-#Python Type
-$ ansible --list-hosts webserver[0]
-List all out of control group
-All bash commands you need to use \ 
+```
+ansible --list-hosts loadbalancers
+ansible --list-hosts "httpd*"
+ansible --list-hosts loadbalancers:lnb1
+```
+Python Style
+```
+ansible --list-hosts webserver[0]
+```
+List all out of control group. All bash commands you need to use \ 
+```
 $ ansible --list-hosts \!control
+```
 
 - More Patterns
 http://docs.ansible.com/ansible/info_patterns.html
