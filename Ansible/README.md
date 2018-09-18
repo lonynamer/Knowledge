@@ -148,7 +148,7 @@ Always check in which module you can do and how to use the module. And see the e
 
 ### Module Packages: apt module, Install a cluster
 ```
-$ cat playbooks/loadbalancer.yml
+$ cat loadbalancer.yml
 
 - hosts: loadbalancers
   tasks: 
@@ -182,11 +182,11 @@ $ cat database.yml
       apt: name=mysql state=present update_cache=yes
 ```
 ```
-ansible-playbook playbooks/database.yml
+ansible-playbook database.yml
 ```
 The second run will fast and will not do nothing because we are in a desired state.
 ```
-ansible-playbook playbooks/database.yml
+ansible-playbook database.yml
 ```
 $ cat webserver.yml
 ---
@@ -370,7 +370,7 @@ ansible-playbook webserver.yml
 - Pip is package management of python, it can create an isolated container, put all python dependencies on it.
 - By default install before ansible 
 ```
-$ cat playbooks/control.yml
+$ cat control.yml
 
     - name: setup python virtualenv
       pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/.venv
@@ -416,7 +416,7 @@ $ cat webserver.yml
     service: name=apache2 state=restarted
 ```
 ```
-ansible-playbook playbooks/webserver.yml
+ansible-playbook webserver.yml
 ```
 
 ### File, File
@@ -720,7 +720,7 @@ $ cat playbooks/stack_restart.yml
 ```
 Add python_httplib2 to control nodes to loadbalancers
 ```
-$ cat playbooks/loadbalancer.yml
+$ cat loadbalancer.yml
 
 - hosts: loadbalancers
   become: true
@@ -755,7 +755,7 @@ $ cat playbooks/loadbalancer.yml
 Add python_httplib2 to control nodes
 ```
 ```
-$ cat playbooks/control.yml
+$ cat control.yml
 
 ---
 - hosts: control
@@ -933,7 +933,7 @@ $ cat roles/control/tasks/main.yml
 ```
 ```
 # For control nodes
-$ cat playbooks/control.yml
+$ cat control.yml
 
 ---
 - hosts: control
@@ -1003,7 +1003,7 @@ server {
 }
 ```
 ```
-$ cat playbooks/loadbalancer.yml
+$ cat loadbalancer.yml
 
 ---
 - hosts: loadbalancers
@@ -1051,7 +1051,7 @@ $ cat roles/nginx/handlers/main.yml
 #### For webservers, move some steps to demo_app role
 #### Split into 2 different roles apache2 and demo_app for copy file etc.
 ```
-$ cat playbooks/webserver.yml
+$ cat webserver.yml
 
 - hosts: webserver
   become: true
@@ -1147,7 +1147,7 @@ ansible -m setup db01
 ```
 A section from roles/mysql/main.yml. Using variable from facts inside yaml to change bind ip in my.cnf conf to our ip. As an example mysql database ip address always changing.
 ```
-# Add to playbooks/mysql.yml
+# Add to database.yml
 - hosts: webservers
   gather_facts: false
 ```
