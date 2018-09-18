@@ -218,7 +218,7 @@ $ cat webserver.yml
 ansible-playbook database.yml
 ```
 
-### Service: servive
+### Service: service
 ```
 $ cat loadbalancer.yml
 
