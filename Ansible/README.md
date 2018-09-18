@@ -7,7 +7,7 @@
 - Ansibe has a logic what you would like to do is a change with the previous state and the current desired state. You will see it in playbooks.
 ---
 ### Installation
-docs.ansible.com/ansible/installation
+- http://docs.ansible.com/ansible/installation
 
 As ansible is a Python application, the best way is installing by pip. Byp pip you also get the newest versions instead of getting 8 versions back by package managers like yum and apt.
 
@@ -116,8 +116,19 @@ $ cat playbooks/hostname.yaml
 
 ### Playbook Execution
 ```
-$ ansible-playbook playbooks/hostname.yml
+$ cat playbooks/hostname.yml
 
+---
+  # Each Item in the list starts with - dash in yaml.
+  - host: all
+    tasks:
+      - name: get server hostname
+        command: hostname
+```
+```
+ansibe=playbook playbooks/hostname.yml
+```
+```
 Output details:
 - PLAY [all]
 - FACTS: Before it runs, it gatters some facts from each host.
@@ -127,17 +138,6 @@ Output details:
   No awareness changed means executed.
 - PLAY RECAP:
   Shows all the steps
-```
-
-```
-$ cat playbooks/hostname.yaml
-
----
-  # Each Item in the list starts with - dash in yaml.
-  - host: all
-    tasks:
-      - name: get server hostname
-        command: hostname
 ```
 
 ### Playbook Introduction
@@ -164,32 +164,44 @@ $ cat playbooks/database.yml
   tasks:
     - name: install mysql
       apt: name=mysql state=present update_cache=yes
-*** CONTINUE
+```
 ### Packages: become
+---
 - Priviledge escalation module
 - Become means runas root
 - As installations should run as root. 
-```
+---
 ```
 $ cat playbooks/database.yml
+
 ---
 - hosts: databases
   become: true
   tasks:
     - name: install mysql
       apt: name=mysql state=present update_cache=yes
-$ ansible-playbook playbooks/hostname.yml
+```
+```
+ansible-playbook playbooks/database.yml
+```
 The second run will fast and will not do nothing because we are in a desired state.
-$ ansible-playbook playbooks/hostname.yml: 
+```
+ansible-playbook playbooks/database.yml: 
+```
 $ cat playbooks/webserver
 ---
 
-### with_items and {{item}}
+### with_items and {{item}} 
+also apt: module is used, in redhat yum:
+---
 - with_items and {{item}} injects the list of packages for multi package installation instead of creating task for each. with_items loop
 - This usage is jinja syntax not yaml. 
 - Jinja is templating language library.
 - http://jinja.pocoo.org/
+```
 $ cat playbooks/webserver.yml
+
+---
 - hosts: webservers
   become: true
   tasks:
@@ -201,9 +213,13 @@ $ cat playbooks/webserver.yml
         - python-pip
         - python-virtualenv
         - python-mysqldb
+```
 
-### Service: service
+### Service: serviyumce
+```
 $ cat playbooks/loadbalancer.yml
+
+---
 - hosts: loadbalancers
   tasks: 
   - name: install nginx
@@ -214,8 +230,11 @@ $ cat playbooks/loadbalancer.yml
     service: name=nginx state=started enabled=yes
     # Stop and disable. Also reload is possible.
     #service: name=nginx state=stoped enabled=no
-
+```
 - On control module where ansible running.
+```
+$ cat playbooks/loadbalancer.yml
+
 ---
 - hosts: control
   become: true
@@ -224,9 +243,13 @@ $ cat playbooks/loadbalancer.yml
       apt: name={{item}} state=present update_cache=yes
       with_items:
         - curl
+```
 
 ### Stack Restart
+
+```
 $ cat playbooks/stack_restart.yml
+
 ---
 - hosts: loadbalancers
   become: true
@@ -252,10 +275,14 @@ $ cat playbooks/stack_restart.yml
   become: true
   tasks:
     - service: name=apache2 state=started
+```
 
 ### Notify and handlers
 #### Services: apache2_module, handlers, notify
+```
 $ cat playbooks/webserver.yml
+
+---
 - hosts: webservers
   become: true
   tasks:
@@ -278,17 +305,19 @@ $ cat playbooks/webserver.yml
   handlers:
   - name restart apache
     service: name=apache2 state=restarted
-
-# If you use service restart, it will restart the service each time playbook is ran even you don't want to and there is no module change. 
-# solution for this is `handlers and notify` if you don't want to restart. As you see above notify will run the handler if there is a change. 
+```
+---
+- If you use service restart, it will restart the service each time playbook is ran even you don't want to and there is no module change. 
+- solution for this is `handlers and notify` if you don't want to restart. As you see above notify will run the handler if there is a change. 
+---
 
 ### File Copy
-`
+```
     - name: copy demo app source
       copy: src=demo/app dest=/var/www/demo mode=0755
       notify: restart apache2
-`
-
+```
+```
 $ cat playbooks/webserver.yml
 - hosts: webservers
   become: true
@@ -320,6 +349,7 @@ $ cat playbooks/webserver.yml
   handlers:
   - name restart apache
     service: name=apache2 state=restarted
+```
 
 ### pip module Application Module pip
 - Pip is package management of python, it can create an isolated container, put all python dependencies on it.
