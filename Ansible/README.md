@@ -1172,7 +1172,7 @@ $ cat playbooks/stack_restart.yml
 
 ### Variables: defaults
 ```
-$ cat roles/mysql/main.yml;
+$ cat roles/mysql/main.yml
 
 - name: create database
   mysql_db: name={{ db_name }} state=present
@@ -1382,7 +1382,7 @@ $ cat databases.yml
 ```
 Use variables inside tasks code. This is called variable routing.
 ```
-$ cat roles/databases/tasks/mysql/main.yml
+$ cat roles/mysql/tasks/main.yml
 
 - name: create database
   mysql_db: name={{ db_name }} state=present
@@ -1600,7 +1600,7 @@ echo "Defaults	!requiretty" >> /etc/sudoers
 There are many ways. It depends what to use according to the situation.
 ---
 1) Moving the restart task after configuration, which is more logical
-2) # commenting in for only one run the erroring section.
+2) commenting in for only one run the erroring section.
 3) Adding ignore_errors: true to the service restart task
 ignore_errors: true
 ---
