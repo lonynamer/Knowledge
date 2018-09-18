@@ -186,7 +186,7 @@ ansible-playbook playbooks/database.yml
 ```
 The second run will fast and will not do nothing because we are in a desired state.
 ```
-ansible-playbook playbooks/database.yml: 
+ansible-playbook playbooks/database.yml
 ```
 $ cat playbooks/webserver
 ---
