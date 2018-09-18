@@ -1,29 +1,29 @@
 ### Ansible Knowledge
 ### What is Ansible
+---
 - Ansible Configuration Management solution.
 - Agentles
 - Writen in Phyton
 - Ansibe has a logic what you would like to do is a change with the previous state and the current desired state. You will see it in playbooks.
-
+---
 ### Installation
 docs.ansible.com/ansible/installation
 
-What is ppa ?
-Personal Package Archives (PPA) enables you to upload Ubuntu source packages to be built and published as an apt repository by Launchpad. PPA is a unique software repository intended for non standard software/updates; it helps you to share out software and updates directly to Ubuntu users.
+As ansible is a Python application, the best way is installing by pip. Byp pip you also get the newest versions instead of getting 8 versions back by package managers like yum and apt.
 
-sudo apt-get update
-sudo apt-get install software-properties-common
-sudo apt-add-repository ppa:ansible/ansible
-
-$ ansible —version
-$ ansible-playbook —version
-$ ansible-galaxy —version
+```
+apt-get install python-pip
+pip install ansible
+ansible-playbook —version
+ansible-galaxy —version
+```
 
 ### Inventory
 Static Inventory File
-
-$ ansible —list-hosts all 
-$ ansible —list-hosts
+```
+ansible —list-hosts all 
+ansible —list-hosts
+```
 
 Inventory file location
 Recomendation is keeping in SVC like git, versioning and change control.
