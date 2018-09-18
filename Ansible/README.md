@@ -1,11 +1,18 @@
 ### Ansible Knowledge
-### What is Ansible
+---
+In this workbook, we will install, 3 tiered application by ansible step by step and learn some of the important modules.
+- nginx as loadbalancer
+- apache2 as webserver for serving a python application
+- mysql
+
+### What is Ansible ?
 ---
 - Ansible Configuration Management solution.
 - Agentles
 - Writen in Phyton
 - Ansibe has a logic what you would like to do is a change with the previous state and the current desired state. You will see it in playbooks.
 ---
+
 ### Installation
 - http://docs.ansible.com/ansible/installation
 
