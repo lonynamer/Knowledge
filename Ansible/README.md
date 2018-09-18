@@ -91,24 +91,33 @@ It's not network ping, ansible ping, responds as pong.
 It's a module in ansible there are modules.
 command is a module for running command line.
 It has large number of modules.
-$ ansible -m ping all
-$ ansible -m command -a "hostname" all
-$ ansible -a "hostname" all
+```
+ansible -m ping all
+ansible -m command -a "hostname" all
+ansible -a "hostname" all
+```
 Error status, if the result is false, ansible returns red colored output else it's green.
+```
 $ ansible -a "/bin/false" all
-
+```
 ### Plays
 Playbooks yaml syntax file. yaml is a simple markup language. 
+```
 $ mkdir playbooks
+```
+```
 $ cat playbooks/hostname.yaml
 ---
   # Each Item in the list starts with - dash in yaml.
   - host: all
     tasks:
       - command: hostname
+```
 
 ### Playbook Execution
+```
 $ ansible-playbook playbooks/hostname.yml
+
 Output details:
 - PLAY [all]
 - FACTS: Before it runs, it gatters some facts from each host.
@@ -118,14 +127,18 @@ Output details:
   No awareness changed means executed.
 - PLAY RECAP:
   Shows all the steps
+```
 
+```
 $ cat playbooks/hostname.yaml
+
 ---
   # Each Item in the list starts with - dash in yaml.
   - host: all
     tasks:
       - name: get server hostname
         command: hostname
+```
 
 ### Playbook Introduction
 You can do everything. Package, Source Repo, Service Hangle, Scripts, File, Directories, Users, Iptables. Make a list of things to configue to run your application. You do it step by step, run and add more steps, debug on the way. Built the last status.
@@ -134,25 +147,30 @@ Always check in which module you can do and how to use the module. And see the e
 - https://docs.ansible.com/ansible/latest/modules/modules_by_category.html
 
 ### Module Packages: apt module, Install a cluster
+```
 $ cat playbooks/loadbalancer.yml
+
 - hosts: loadbalancers
   tasks: 
   - name: install nginx
     apt: name=nginx state=present update_cache=yes
     # removing
     apt: name=nginx state=absent update_cache=yes
-
+```
+```
 $ cat playbooks/database.yml
 ---
 - hosts: databases
   tasks:
     - name: install mysql
       apt: name=mysql state=present update_cache=yes
-
+*** CONTINUE
 ### Packages: become
 - Priviledge escalation module
 - Become means runas root
 - As installations should run as root. 
+```
+```
 $ cat playbooks/database.yml
 ---
 - hosts: databases
