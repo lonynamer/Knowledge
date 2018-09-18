@@ -615,7 +615,7 @@ ansible-playbook playbooks/database.yml
 - https://docs.ansible.com/ansible/wait_for_module.html
 
 Create stack_status.yml playbook
-
+```
 $ cat playbooks/stack_status.yml
 
 ---
@@ -650,6 +650,9 @@ $ cat playbooks/stack_status.yml
       with_items: groups.loadbalancers
       register: lb_index
 ```
+```
+ansible-playbook playbooks/stack_status.yml
+```
 
 Enchance stack_restart.yaml
 Use wait_for till the conncetions to drain for the next step.
@@ -660,7 +663,6 @@ Use wait_for till the conncetions to drain for the next step.
     - service: name=nginx state=stopped
     - wait_for: port=80 state=drained
 ```
-
 Use wait_for till port=80 not answering
 ```
 - hosts: webservers
@@ -673,8 +675,6 @@ Use wait_for till port=80 not answering
 ```
 $ cat playbooks/stack_restart.yml
 
-```
-$ cat playbooks/stack_restart.yml
 ---
 - hosts: loadbalancers
   become: true
@@ -705,20 +705,19 @@ $ cat playbooks/stack_restart.yml
 ```
 
 ### Support Playbook 2 - Stack Status: uri, register, fail, when, wait_for
-
-### python-httplib2 is necessary on nginx and ansible - wait_for is a module to wait an amount of time for a port or file and timeout with timeout parameter. default is 300 seconds. control to run this. To check status of load balancer and behind load balancer.
+---
+- python-httplib2 is necessary on nginx and ansible - wait_for is a module to wait an amount of time for a port or file and timeout with timeout parameter. default is 300 seconds. control to run this. To check status of load balancer and behind load balancer.
 - https://docs.ansible.com/ansible/uri_module.html
 - https://docs.ansible.com/ansible/playbooks_conditionals.html#register-variables
 - https://docs.ansible.com/ansible/playbooks_conditionals.html#the-when-statement
 - https://docs.ansible.com/ansible/playbooks_loops.html#standard-loops
-
+---
 ```
     - name: install tools
       apt: name={{intem}} state=present update_cache=yes
       with_items:
         - python-httplib2
 ```
-
 Add python_httplib2 to control nodes to loadbalancers
 $ cat playbooks/loadbalancer.yml
 - hosts: loadbalancers
