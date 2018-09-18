@@ -482,7 +482,7 @@ ansible-playbook webserver.yml
 ```
 
 ### Files: template
-$ mkdir template
+$ mkdir templates
 
 ```
 $ cat roles/nginx/templates/nginx.conf.j2
