@@ -447,6 +447,69 @@ ansible-playbook webserver.yml
 - solution for this is `handlers and notify` if you don't want to restart. As you see above notify will run the handler if there is a change. 
 ---
 
+### Preparation on control node before file copy
+```
+mkdir -p demo/app
+```
+```
+$ cat demo/demo.conf
+
+<VirtualHost *>
+    WSGIDaemonProcess demo threads=5
+    WSGIScriptAlias / /var/www/demo/demo.wsgi
+
+    <Directory /var/www/demo>
+        WSGIProcessGroup demo
+        WSGIApplicationGroup %{GLOBAL}
+        Order deny,allow
+        Allow from all
+    </Directory>
+</VirtualHost>
+```
+```
+$ cat demo/app/requirement.txt
+
+Flask==0.10.1
+Flask-SQLAlchemy==2.0
+```
+```
+from flask import Flask
+from flask.ext.sqlalchemy import SQLAlchemy
+import os, socket
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
+db = SQLAlchemy(app)
+hostname = socket.gethostname()
+
+@app.route('/')
+def index():
+  return 'Hello, from sunny %s!\n' % hostname
+
+@app.route('/db')
+def dbtest():
+  try:
+      db.create_all()
+  except Exception as e:
+      return e.message + '\n'
+  return 'Database Connected from %s!\n' % hostname
+
+if __name__ == '__main__':
+  app.run()
+```
+```
+activate_this = '/var/www/demo/.venv/bin/activate_this.py'
+execfile(activate_this, dict(__file__=activate_this))
+
+import os
+os.environ['DATABASE_URI'] = 'mysql://demo:demo@db01/demo'
+
+import sys
+sys.path.insert(0, '/var/www/demo')
+
+from demo import app as application
+```
+
 ### File Copy
 ```
     - name: copy demo app source
