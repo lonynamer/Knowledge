@@ -473,6 +473,8 @@ Flask==0.10.1
 Flask-SQLAlchemy==2.0
 ```
 ```
+cat demo/app/demo.py
+
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 import os, socket
@@ -498,6 +500,8 @@ if __name__ == '__main__':
   app.run()
 ```
 ```
+$ cat demo/app/demo.wsgi
+
 activate_this = '/var/www/demo/.venv/bin/activate_this.py'
 execfile(activate_this, dict(__file__=activate_this))
 
