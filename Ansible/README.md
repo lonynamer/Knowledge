@@ -57,8 +57,7 @@ It can be used and can perform;
 ### Installation
 ---
 - http://docs.ansible.com/ansible/installation
-
-As ansible is a Python application, the best way is installing by pip. Byp pip you also get the newest versions instead of getting 8 versions back by package managers like yum and apt.
+- As ansible is a Python application, the best way is installing by pip. Byp pip you also get the newest versions instead of getting 8 versions back by package managers like yum and apt.
 ---
 Installation
 ```
