@@ -90,6 +90,10 @@ https://docs.ansible.com/ansible/2.5/plugins/plugins.html
 Get installed modules
 ```
 ansible-doc -l
+ansible-doc file
+ansible-doc copy
+ansible-doc install
+ansible-doc ping
 ```
 ```
 # OR Get ansible module location and list
@@ -138,7 +142,9 @@ ansible_user=vagrant
 ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
 ```
 ```
+# dev is iventory file
 ansible -i dev --list-hosts all
+ansible -i dev -a hostname all
 ```
 
 ### Host Selection
