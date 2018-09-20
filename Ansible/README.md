@@ -1,6 +1,6 @@
 ### Ansible Knowledge
 ---
-In this workbook, we will install, 3 tiered application by ansible step by step and learn some of the important modules.
+In the continuation of this workbook, we will install, 3 tiered application by ansible step by step and learn some of the important modules.
 - nginx as loadbalancer
 - apache2 as webserver for serving a python application
 - mysql
@@ -9,7 +9,7 @@ In this workbook, we will install, 3 tiered application by ansible step by step 
 ---
 - Ansible Configuration Management solution and not only a CM. 
 - Simple automation language and engine that runs ansible playbooks YAML files.
-- Agentles
+- Agentless
 - Writen in `Phyton`
 - `Ansible Tower` in the enterprise framwork for controlling, securing and managing Ansible
 - Ansibe has a logic what you would like to do is a change with the previous state and the current desired state. You will see it in playbooks and when you run multiple times it perform only the difference.
@@ -17,6 +17,13 @@ In this workbook, we will install, 3 tiered application by ansible step by step 
 - `Simple`, human readble, no special coding skills
 - `Powerfull` and can orchestrate the complete app life cycle
 - `Agentless`, uses OpenSSH and WinRM
+---
+
+### To Get Started And Learn More
+---
+- http://ansible.com/get-started
+- http://ansible.com/community
+- http://redhat.com/en/services/training/do407-automation-ansible
 ---
 
 ### The Ansible Way
@@ -47,13 +54,18 @@ It can be used and can perform;
 ---
 
 ### Installation
+---
 - http://docs.ansible.com/ansible/installation
 
 As ansible is a Python application, the best way is installing by pip. Byp pip you also get the newest versions instead of getting 8 versions back by package managers like yum and apt.
-
+---
+Installation
 ```
 apt-get install python-pip
 pip install ansible
+```
+Check Installation
+```
 ansible --version
 ansible-playbook —version
 ansible-galaxy —version
@@ -65,10 +77,11 @@ It can be over-ridden by creating a directory and put ansible.cfg and hosts (inv
 ---
 - PLAYBOOKS: Written in `YAML` describing the changes.
 - MODULES:
-- PLUGINS: Mostly are modules that are running on control node.
+- PLUGINS: Mostly are modules that are running on control node for specific issues.
 https://docs.ansible.com/ansible/2.5/plugins/plugins.html
 - INVENTORY
 ---
+
 ### Modules
 ---
 - http://docs.ansible.com
@@ -78,6 +91,15 @@ Get installed modules
 ```
 ansible-doc -l
 ```
+```
+# OR Get ansible module location and list
+ansible --version
+ls 
+1
+/usr/lib/python2.7/dist-packages/ansible/modules/core/network/ios/ios_config.p
+
+```
+
 ### Modules Run Commands
 ---
 - `command`: run a OS command directly.
@@ -95,6 +117,7 @@ $ cat /etc/ansible/ansible.cfg
 [defaults]
 inventory=./dev
 ```
+
 ### Inventory
 ---
 Data that invetory holds;
@@ -120,6 +143,7 @@ ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
 ```
 ansible -i dev --list-hosts all
 ```
+
 ### Host Selection
 You can use regex
 ```
@@ -156,6 +180,7 @@ Error status, if the result is false, ansible returns red colored output else it
 ```
 $ ansible -a "/bin/false" all
 ```
+
 ### Ad-Hoc Commands
 ```
 ansible all -m ping
