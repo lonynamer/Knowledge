@@ -255,6 +255,7 @@ $ cat database.yml
 - Priviledge escalation module
 - Become means runas root
 - As installations should run as root. 
+- https://docs.ansible.com/ansible/2.4/become.html
 ---
 ```
 $ cat database.yml
