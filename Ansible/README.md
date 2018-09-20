@@ -317,11 +317,11 @@ $ cat loadbalancer.yml
   tasks: 
   - name: install nginx
     apt: name=nginx state=present update_cache=yes
-    # removing
+    <!--- # removing --->
     apt: name=nginx state=absent update_cache=yes
   - name: ensure nginx started
     service: name=nginx state=started enabled=yes
-    # Stop and disable. Also reload is possible.
+    <!--- # Stop and disable. Also reload is possible. --->
     #service: name=nginx state=stoped enabled=no
 ```
 - On control module where ansible running.
