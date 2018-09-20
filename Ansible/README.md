@@ -42,8 +42,8 @@ In the continuation of this workbook, we will install, 3 tiered application by a
 - Over 1300 modules: cloud, containers, database, files, messaging, monitoring, network, notifications, packaging, source control, system, testing, utilizers, web infrastructure.
 ---
 
-### It's not only a traditional CM tool:
-It can be used and can perform;
+###  It's not only a traditional CM tool:
+### It can be used and can perform;
 ---
 - Application Deployment
 - Multi-Tier Orchestration
