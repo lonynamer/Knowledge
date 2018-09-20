@@ -63,8 +63,28 @@ It can be over-ridden by creating a directory and put ansible.cfg and hosts (inv
 
 ### How Ansible Works
 ---
-- PLAYBOOKS: YAML   - MODULES
-- PLUGINS           - INVENTORY
+- PLAYBOOKS: Written in `YAML` describing the changes.
+- MODULES:
+- PLUGINS: Mostly are modules that are running on control node.
+https://docs.ansible.com/ansible/2.5/plugins/plugins.html
+- INVENTORY
+---
+### Modules
+---
+- http://docs.ansible.com
+- apt/yum , copy , file , get_url , git, ping , debug , service , synchronize , template , uri , user, wait_for, assert
+---
+Get installed modules
+```
+ansible-doc -l
+```
+### Modules Run Commands
+---
+- `command`: run a OS command directly.
+- `shell`: running a command by remote shell starting /bin/sh.
+- `script`: run a script after transfering it.
+- `raw`: Executes a command without going through the ansible module subsystem.
+To work in ansiblist way, don't use non of them, as ansible works in a logic to keep the things in a desired state where described in playbooks. The seond time you run a playbook, if the description and the infrastructure matching, it will not do nothing. If you do a change and run again, only that change will. Modules are designed by this logic that's why should only be used.
 ---
 
 ### Ansible.cfg
