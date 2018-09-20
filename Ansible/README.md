@@ -614,7 +614,7 @@ ansible-playbook webserver.yml
 #### Disable apache default site and enable our new site.
 ```
     - name: de-activate default apache site
-      file: path=/etc/apache2/sites-enabled/000-default.conf
+      file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
       notify: restart apache
 
     - name: activate demo apache site
