@@ -76,7 +76,7 @@ It can be over-ridden by creating a directory and put ansible.cfg and hosts (inv
 ### How Ansible Works
 ---
 - PLAYBOOKS: Written in `YAML` describing the changes.
-- MODULES:
+- MODULES: tools in toolkit.
 - PLUGINS: Mostly are modules that are running on control node for specific issues. Example a module that does API to manage a resource.
 https://docs.ansible.com/ansible/2.5/plugins/plugins.html
 - INVENTORY
