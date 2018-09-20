@@ -479,7 +479,7 @@ Flask==0.10.1
 Flask-SQLAlchemy==2.0
 ```
 ```
-cat demo/app/demo.py
+$ cat demo/app/demo.py
 
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -522,12 +522,14 @@ from demo import app as application
 
 ### File Copy
 ```
+$ cat webserver.yml # Add
+
     - name: copy demo app source
       copy: src=demo/app dest=/var/www/demo mode=0755
       notify: restart apache2
 ```
 ```
-$ cat webserver.yml
+$ cat webserver.yml # File
 - hosts: webservers
   become: true
   tasks:
