@@ -5,12 +5,45 @@ In this workbook, we will install, 3 tiered application by ansible step by step 
 - apache2 as webserver for serving a python application
 - mysql
 
-### What is Ansible ?
+### First of All, What is Ansible ?
 ---
-- Ansible Configuration Management solution.
+- Ansible Configuration Management solution and not only a CM. 
+- Simple automation language and engine that runs ansible playbooks YAML files.
 - Agentles
-- Writen in Phyton
-- Ansibe has a logic what you would like to do is a change with the previous state and the current desired state. You will see it in playbooks.
+- Writen in `Phyton`
+- `Ansible Tower` in the enterprise framwork for controlling, securing and managing Ansible
+- Ansibe has a logic what you would like to do is a change with the previous state and the current desired state. You will see it in playbooks and when you run multiple times it perform only the difference.
+- Competitors: `Puppet`, `Chef`, `Saltstack`
+- `Simple`, human readble, no special coding skills
+- `Powerfull` and can orchestrate the complete app life cycle
+- `Agentless`, uses OpenSSH and WinRM
+---
+
+### The Ansible Way
+---
+- Cross Platform: Linux, Windows, Unix
+- Human Readable: YAML and Jinja2 (Markup Language)
+- Perfect Description Of Application: Ensuring everyone is on the same page.
+- Version Controlled
+- Dynamic Inventories: Capture all the servers % 100 of the time, regardless of infra, location etc.
+- Orchastration That Play Weel With Others: HP SA, Pupet, Jenkins, RHNSS to homogenize existing environments by current toolsets and update mechanisms.
+---
+
+### Large community and wide variety of automation taks
+---
+- Over 1300 modules: cloud, containers, database, files, messaging, monitoring, network, notifications, packaging, source control, system, testing, utilizers, web infrastructure.
+---
+
+### It's not only a traditional CM tool:
+It can be used and can perform;
+---
+- Application Deployment
+- Multi-Tier Orchestration
+- Provisioning
+- Configuration Management
+- Continuous Delivery
+- Security & Compliance
+- It's the only automation engine/language that can automate the entire application lifecycle and continuous delivery pipeline.
 ---
 
 ### Installation
@@ -21,44 +54,15 @@ As ansible is a Python application, the best way is installing by pip. Byp pip y
 ```
 apt-get install python-pip
 pip install ansible
+ansible --version
 ansible-playbook —version
 ansible-galaxy —version
 ```
-
-### Inventory
-Static Inventory File
-```
-ansible —list-hosts all 
-ansible —list-hosts
-```
-
-Inventory file location
-Recomendation is keeping in SVC like git, versioning and change control.
-You can also create a directory and put inside ansible.cfg file describing hosts inventory location.
-```
-$ cat /etc/ansible/hosts  # Default inventory location defined globally
-
-[loadbalancers]
-lnb1
-lnb2
-hostname
-orip
-192.168.150.10
-
-[webservers]
-httpd1
-httpd2
-
-[databases]
-mysql1
-localhost ansible_connection=local
-
-[control]
+default config file= /etc/ansible/ansible.cfg
+It can be over-ridden by creating a directory and put ansible.cfg and hosts (inventory) inside and keep at git for version conrol.
 # You can specify connection type, default is ssh, as below you can set as local.
 control ansible_connection=local
-```
 
-You can name the inventory file as dev and call like this.
 ```
 ansible -i dev --list-hosts all
 ```
@@ -89,7 +93,6 @@ List all out of control group. All bash commands you need to use \
 ```
 $ ansible --list-hosts \!control
 ```
-
 - More Patterns
 http://docs.ansible.com/ansible/info_patterns.html
 
