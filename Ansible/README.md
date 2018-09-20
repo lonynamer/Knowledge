@@ -94,10 +94,7 @@ ansible-doc -l
 ```
 # OR Get ansible module location and list
 ansible --version
-ls 
-1
-/usr/lib/python2.7/dist-packages/ansible/modules/core/network/ios/ios_config.p
-
+ls /usr/lib/python2.7/dist-packages/ansible/modules/
 ```
 
 ### Modules Run Commands
