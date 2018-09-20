@@ -1676,6 +1676,28 @@ visudo
 echo "Defaults	!requiretty" >> /etc/sudoers
 ```
 
+### Module block:
+- https://docs.ansible.com/ansible/2.6/user_guide/playbooks_blocks.html
+```
+tasks:
+ - name: Attempt and graceful roll back demo
+   block:
+     - debug:
+         msg: 'I execute normally'
+     - command: /bin/false
+     - debug:
+         msg: 'I never execute, due to the above task failing'
+   rescue:
+     - debug:
+         msg: 'I caught an error'
+     - command: /bin/false
+     - debug:
+         msg: 'I also never execute :-('
+   always:
+     - debug:
+         msg: "This always executes"
+```
+
 ### Troubleshooting Ordering Problems
 ---
 - As and example you have 2 tasks, first is restart the service and second configure the service.
@@ -1821,3 +1843,4 @@ ship-to: *id001
 #### List of control structures
 - Learn If, Loop structures
 http://jinja.pocoo.org/docs/2.10/templates/#list-of-control-structures
+
