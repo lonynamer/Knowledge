@@ -273,9 +273,6 @@ The second run will fast and will not do nothing because we are in a desired sta
 ```
 ansible-playbook database.yml
 ```
-```
-$ cat webserver.yml
----
 
 ### with_items and {{item}} 
 also apt: module is used, in redhat yum:
@@ -284,6 +281,8 @@ also apt: module is used, in redhat yum:
 - This usage is jinja syntax not yaml. 
 - Jinja is templating language library.
 - http://jinja.pocoo.org/
+---
+
 ```
 $ cat webserver.yml
 
