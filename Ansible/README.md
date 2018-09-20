@@ -271,8 +271,9 @@ Always check in which module you can do and how to use the module. And see the e
 
 ### Module Packages: apt module, Install a cluster
 ```
-$ cat loadbalancer.yml
+$ cat loadbalancer.yml # File
 
+---
 - hosts: loadbalancers
   tasks: 
   - name: install nginx
@@ -281,13 +282,15 @@ $ cat loadbalancer.yml
     apt: name=nginx state=absent update_cache=yes
 ```
 ```
-$ cat database.yml
+$ cat database.yml # File
+
 ---
 - hosts: databases
   tasks:
     - name: install mysql
       apt: name=mysql state=present update_cache=yes
 ```
+
 ### Packages: become
 ---
 - Priviledge escalation module
@@ -296,7 +299,7 @@ $ cat database.yml
 - https://docs.ansible.com/ansible/2.4/become.html
 ---
 ```
-$ cat database.yml
+$ cat database.yml # File
 
 ---
 - hosts: databases
@@ -306,7 +309,10 @@ $ cat database.yml
       apt: name=mysql state=present update_cache=yes
 ```
 ```
+ansible-playbook control.yml
 ansible-playbook database.yml
+ansible-playbook webserver.yml
+ansible-playbook loadbalancer.yml
 ```
 The second run will fast and will not do nothing because we are in a desired state.
 ```
@@ -339,7 +345,7 @@ $ cat webserver.yml
         - python-mysqldb
 ```
 ```
-ansible-playbook database.yml
+ansible-playbook webserver.yml
 ```
 
 ### Service: service
@@ -360,7 +366,7 @@ $ cat loadbalancer.yml
 ```
 - On control module where ansible running.
 ```
-$ cat loadbalancer.yml
+$ cat loadbalancer.yml # File
 
 ---
 - hosts: control
@@ -378,7 +384,7 @@ ansible-playbook loadbalancer.yml
 ### Stack Restart
 
 ```
-$ cat playbooks/stack_restart.yml
+$ cat playbooks/stack_restart.yml # File
 
 ---
 - hosts: loadbalancers
@@ -413,7 +419,7 @@ ansible-playbook playbooks/stack_restart.yml
 ### Notify and handlers
 #### Services: apache2_module, handlers, notify
 ```
-$ cat webserver.yml
+$ cat webserver.yml # File
 
 ---
 - hosts: webservers
@@ -561,14 +567,14 @@ ansible-playbook webserver.yml
 - Pip is package management of python, it can create an isolated container, put all python dependencies on it.
 - By default install before ansible 
 ```
-$ cat control.yml
+$ cat webserver.yml # Add
 
     - name: setup python virtualenv
       pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/.venv
       notify: restart apache
 ```
 ```
-$ cat webserver.yml
+$ cat webserver.yml # File
 
 ---
 - hosts: webservers
@@ -599,7 +605,7 @@ $ cat webserver.yml
       notify: restart apache2
 
     - name: setup python virtualenv
-      pip:       requirements=/var/www/demo/requirements.txt virtualenv=/var/www/.venv
+      pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/.venv
       notify: restart apache
 
   handlers:
@@ -613,6 +619,8 @@ ansible-playbook webserver.yml
 ### File, File
 #### Disable apache default site and enable our new site.
 ```
+$ cat webserver.yml # Add
+
     - name: de-activate default apache site
       file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
       notify: restart apache
@@ -622,7 +630,7 @@ ansible-playbook webserver.yml
       notify: restart apache
 ```
 ```
-$ cat webserver.yml
+$ cat webserver.yml # File
 
 ---
 - hosts: webservers
@@ -676,7 +684,7 @@ ansible-playbook webserver.yml
 $ mkdir templates
 
 ```
-$ cat roles/nginx/templates/nginx.conf.j2
+$ cat templates/nginx.conf.j2 # File
 
 # Jinja format loop upstream
 upstream demo {
@@ -693,7 +701,7 @@ server {
 }
 ```
 ```
-$ cat loadbalancer.yml
+$ cat loadbalancer.yml # File
 
 ---
 - hosts: loadbalancers
@@ -706,7 +714,7 @@ $ cat loadbalancer.yml
     service: name=nginx state=started enabled=yes
 
   - name: configure nginx site
-    template: src=template/nginx.conf.j2 dest=/etc/nginx/sites-available/demo mode=0644
+    template: src=templates/nginx.conf.j2 dest=/etc/nginx/sites-available/demo mode=0644
     notify: restart nginx
 
   - name: disable default nginx site
@@ -728,8 +736,10 @@ $ ansible-playbook loadbalancer.yml
 ### Files: lineinfile
 ### Change configuration inside a file.
 ```
+$ cat database.yml # Add
+
    - name ensure mysql listening on all ports
-     lineinfile: dest/etc/mysql/my.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
+     lineinfile: dest=/etc/mysql/my.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
      notify restart mysql
 
      handlers: 
@@ -737,7 +747,7 @@ $ ansible-playbook loadbalancer.yml
        service name=mysql state=restarted  
 ```
 ```
-$ cat database.yml
+$ cat database.yml # File
 
 ---
 - hosts: databases
@@ -764,6 +774,8 @@ ansible-playbook database.yml
 ### Application Modules: mysql_db, mysql_user
 #### Configure mysql user and password.
 ```
+$ cat database.yml # Add
+
 - name create demo database
   mysql_db: name=demo state=present
 
@@ -771,7 +783,7 @@ ansible-playbook database.yml
   mysql_user: name=demo pasword=demo priv=demo.*:ALL
 ```
 ```
-$ cat database.yml
+$ cat database.yml # File
 
 ---
 - hosts: databases
@@ -807,7 +819,7 @@ ansible-playbook database.yml
 
 Create stack_status.yml playbook
 ```
-$ cat playbooks/stack_status.yml
+$ cat playbooks/stack_status.yml # File
 
 ---
 - hosts: loadbalancers
@@ -848,6 +860,8 @@ ansible-playbook playbooks/stack_status.yml
 Enchance stack_restart.yaml
 Use wait_for till the conncetions to drain for the next step.
 ```
+$ cat playbooks/stack_restart.yml # Add
+
 - hosts: loadbalancers
   become: true
   tasks:
@@ -856,6 +870,8 @@ Use wait_for till the conncetions to drain for the next step.
 ```
 Use wait_for till port=80 not answering
 ```
+$ cat playbooks/stack_restart.yml # Add
+
 - hosts: webservers
   become: true
   tasks:
@@ -864,7 +880,7 @@ Use wait_for till port=80 not answering
 ```
 
 ```
-$ cat playbooks/stack_restart.yml
+$ cat playbooks/stack_restart.yml # File
 
 ---
 - hosts: loadbalancers
@@ -904,6 +920,8 @@ $ cat playbooks/stack_restart.yml
 - https://docs.ansible.com/ansible/playbooks_loops.html#standard-loops
 ---
 ```
+$ cat loadbalancer.yml # Add
+
     - name: install tools
       apt: name={{intem}} state=present update_cache=yes
       with_items:
@@ -911,7 +929,7 @@ $ cat playbooks/stack_restart.yml
 ```
 Add python_httplib2 to control nodes to loadbalancers
 ```
-$ cat loadbalancer.yml
+$ cat loadbalancer.yml # File
 
 - hosts: loadbalancers
   become: true
@@ -946,7 +964,7 @@ $ cat loadbalancer.yml
 Add python_httplib2 to control nodes
 ```
 ```
-$ cat control.yml
+$ cat control.yml # Add
 
 ---
 - hosts: control
@@ -960,6 +978,8 @@ $ cat control.yml
 ```
 Add to playbooks/stack_status.yml
 ```
+$ cat playbooks/stack_status.yml # Add
+
 # for loadbalancers response
 - hosts: control
   tasks:
@@ -988,7 +1008,7 @@ Add to playbooks/stack_status.yml
       with_items "{{app_index.results}}"
 ```
 ```
-$ cat playbooks/stack_status.yml
+$ cat playbooks/stack_status.yml # File
 
 ---
 - hosts: loadbalancers
@@ -1113,7 +1133,7 @@ $ ansible-galaxy install -r requirments.yml
 
 ```
 # For control nodes
-$ cat roles/control/tasks/main.yml
+$ cat roles/control/tasks/main.yml # File
 
 ---
     - name: install tools
@@ -1124,7 +1144,7 @@ $ cat roles/control/tasks/main.yml
 ```
 ```
 # For control nodes
-$ cat control.yml
+$ cat control.yml # File
 
 ---
 - hosts: control
@@ -1133,6 +1153,7 @@ $ cat control.yml
     - control
 ```
 ```
+$ cat database.yml # File
 # for databases
 - hosts: databases
   become: true
@@ -1321,7 +1342,7 @@ name: restart apache2
 ### Site.yml include
 Include everything in one file. You can do incluse in tasks and handlers as well.
 ```
-cat roles/site.yml
+$ cat roles/site.yml
 
 ---
 - include: control.yml
@@ -1330,7 +1351,7 @@ cat roles/site.yml
 - include: loadbalancer.yml
 ```
 
-### Variable: facts
+### Variable: facts (gather_facts)
 Gathering facts and variables.
 This will print all the information related to server in json format.
 ```
@@ -1348,7 +1369,7 @@ A section from roles/mysql/main.yml. Using variable from facts inside yaml to ch
   gather_facts: false
 ```
 ```
-$ cat roles/mysql/site.yml
+$ cat roles/mysql/tasks/main.yml
 
 - name: ensure mysql listening on all ports
   lineinfile: dest=/etc/mysql/my.cnf regexp=^bind-address
@@ -1363,7 +1384,7 @@ $ cat playbooks/stack_restart.yml
 
 ### Variables: defaults
 ```
-$ cat roles/mysql/main.yml
+$ cat roles/mysql/tasks/main.yml # Add
 
 - name: create database
   mysql_db: name={{ db_name }} state=present
@@ -1374,7 +1395,7 @@ $ cat roles/mysql/main.yml
 ```
 Variables are set in defaults folder under roles.
 ```
-$ cat roles/mysql/defaults/main.yml
+$ cat roles/mysql/defaults/main.yml # File
 
 db_name: mypp
 db_user_name: dbuser
@@ -1746,11 +1767,10 @@ tasks:
 ```
 
 ### Accelerated Mode and Pipelining
-#### Accelerated Mode
+#### Accelerated Mode (paramiko)
 ---
 - Ansible is a python app which uses ssh. 
 - https://docs.ansible.com/ansible/2.3/playbooks_acceleration.html
-- Not reccommended what it does is keepalive ssh connection.
 ---
 ```
 - hosts:
