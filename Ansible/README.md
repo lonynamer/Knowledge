@@ -231,6 +231,38 @@ Output details:
   Shows all the steps
 ```
 
+### Let's start to describe our Infrastructure by Creating Our Static Inventory File and Configuration File.
+---
+- We have a nginx load balancer, behing load balancer 2 apache2 web servers, 1 mysql database.
+- Also control node our server that runs ansible.
+---
+```
+mkdir ansible
+cd ansible
+```
+```
+$ cat ansible.cfg
+
+[defaults]
+inventory=./dev
+```
+```
+$ cat dev
+
+[loadbalancers]
+lb01 ansible_host=<ip_address>
+
+[webservers]
+app01  ansible_host=<ip_address>
+app02  ansible_host=<ip_address>
+
+[databases]
+db01  ansible_host=<ip_address>
+
+[controls]
+control ansible_connection=local
+```
+
 ### Playbook Introduction
 You can do everything. Package, Source Repo, Service Hangle, Scripts, File, Directories, Users, Iptables. Make a list of things to configue to run your application. You do it step by step, run and add more steps, debug on the way. Built the last status.
 
