@@ -17,6 +17,7 @@ In the continuation of this workbook, we will install, 3 tiered application by a
 - `Simple`, human readble, no special coding skills
 - `Powerfull` and can orchestrate the complete app life cycle
 - `Agentless`, uses OpenSSH and WinRM
+- Can also use `API`.
 ---
 
 ### To Get Started And Learn More
@@ -77,7 +78,7 @@ It can be over-ridden by creating a directory and put ansible.cfg and hosts (inv
 ---
 - PLAYBOOKS: Written in `YAML` describing the changes.
 - MODULES:
-- PLUGINS: Mostly are modules that are running on control node for specific issues.
+- PLUGINS: Mostly are modules that are running on control node for specific issues. Example a module that does API to manage a resource.
 https://docs.ansible.com/ansible/2.5/plugins/plugins.html
 - INVENTORY
 ---
