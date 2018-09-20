@@ -276,6 +276,7 @@ The second run will fast and will not do nothing because we are in a desired sta
 ```
 ansible-playbook database.yml
 ```
+```
 $ cat webserver.yml
 ---
 
