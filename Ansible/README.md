@@ -60,19 +60,45 @@ ansible-galaxy —version
 ```
 default config file= /etc/ansible/ansible.cfg
 It can be over-ridden by creating a directory and put ansible.cfg and hosts (inventory) inside and keep at git for version conrol.
-# You can specify connection type, default is ssh, as below you can set as local.
-control ansible_connection=local
 
-```
-ansible -i dev --list-hosts all
-```
+### How Ansible Works
+---
+- PLAYBOOKS: YAML   - MODULES
+- PLUGINS           - INVENTORY
+---
 
+### Ansible.cfg
 You can set as default inventory file as dev.
 ```
 $ cat /etc/ansible/ansible.cfg
 
 [defaults]
 inventory=./dev
+```
+### Inventory
+---
+Data that invetory holds;
+- Hosts                               - Groups
+- Inventory-specific data (variables) - Static or dynamic sources
+---
+```
+$ cat ./dev
+
+[control]
+control ansible_host=localhost ansible_connection=localhost
+
+[web]
+node-[1:3] ansible_host=10.42.0.[6:8]
+
+[haproxy]
+haproxy ansible_host=10.42.0.100
+
+[all:vars]
+ansible_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+```
+```
+ansible -i dev --list-hosts all
 ```
 ### Host Selection
 You can use regex
@@ -96,7 +122,7 @@ $ ansible --list-hosts \!control
 - More Patterns
 http://docs.ansible.com/ansible/info_patterns.html
 
-### Tasks
+### Tasks & Ad-Hoc Commands
 It's not network ping, ansible ping, responds as pong.
 It's a module in ansible there are modules.
 command is a module for running command line.
@@ -110,6 +136,13 @@ Error status, if the result is false, ansible returns red colored output else it
 ```
 $ ansible -a "/bin/false" all
 ```
+### Ad-Hoc Commands
+```
+ansible all -m ping
+ansible localhost -m setup  # gather_facts
+ansible localhost -m command -a "uptime"
+```
+
 ### Plays
 Playbooks yaml syntax file. yaml is a simple markup language. 
 ```
@@ -121,7 +154,7 @@ $ cat playbooks/hostname.yaml
   # Each Item in the list starts with - dash in yaml.
   - host: all
     tasks:
-      - command: hostname
+      - command: name=task
 ```
 
 ### Playbook Execution
