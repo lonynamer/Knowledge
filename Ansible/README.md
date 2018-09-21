@@ -1013,8 +1013,8 @@ $ cat playbooks/stack_status.yml # Add
 - hosts: control
   tasks:
     - name: verify end-to-end response
-      uri: url=http://{{item}} return_content=yes
-      with_items: groups.loadbalancers
+      uri: url=http://{{ hostvars[item].ansible_host }} return_content=yes
+      with_items: {{ groups.loadbalancers }}
       register: lb_index
 
     - fail: msg="index failed to return content"
@@ -1025,8 +1025,8 @@ $ cat playbooks/stack_status.yml # Add
 - hosts: loadbalancers
   tasks:
     - name: verify end-to-end response
-      uri: url=http://{{item}} return_content=yes
-      with_items: groups.webservers
+      uri: url=http://{{ hostvars[item].ansible_host }} return_content=yes
+      with_items: {{ groups.webservers }}
       # content output
       register: app_index
 
@@ -1075,8 +1075,8 @@ $ cat playbooks/stack_status.yml # File
 - hosts: control
   tasks:
     - name: verify end-to-end response
-      uri: url=http://{{item}} return_content=yes
-      with_items: groups.loadbalancers
+      uri: url=http://{{ hostvars[item].ansible_host }} return_content=yes
+      with_items: {{ groups.loadbalancers }}
       register: lb_index
 
     - fail: msg="index failed to return content"
@@ -1087,8 +1087,8 @@ $ cat playbooks/stack_status.yml # File
 - hosts: loadbalancers
   tasks:
     - name: verify end-to-end response
-      uri: url=http://{{item}} return_content=yes
-      with_items: groups.webservers
+      uri: url=http://{{ hostvars[item].ansible_host }} return_content=yes
+      with_items: {{ groups.webservers }}
       # content output
       register: app_index
 
