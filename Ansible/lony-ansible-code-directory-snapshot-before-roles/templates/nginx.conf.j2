@@ -1,0 +1,15 @@
+# Jinja format loop upstream
+upstream demo {
+{% for server in groups.webservers %}
+#  server {{ server }};
+  server {{ hostvars[server].ansible_host }};
+{% endfor %}
+}
+
+# Nginx conf format
+server {
+  listen 80;
+  location / {
+    proxy_pass http://demo;
+  }
+}

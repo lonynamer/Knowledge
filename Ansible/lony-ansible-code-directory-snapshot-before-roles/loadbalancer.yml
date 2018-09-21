@@ -1,0 +1,33 @@
+---
+- hosts: loadbalancers
+  become: true
+  tasks:
+    - name: install nginx
+      apt: name={{item}} state=present update_cache=yes
+      with_items:
+        - nginx
+        - curl
+        - python-httplib2
+
+    - name: disable default nginx site
+      file: dest=/etc/nginx/sites-available/demo state=absent
+      notify: restart nginx
+
+    - name: ensure nginx enabled and running
+      service: name=nginx state=started enabled=yes
+
+    - name: configure nginx site
+      template: src=templates/nginx.conf.j2 dest=/etc/nginx/sites-available/demo mode=0644
+      notify: restart nginx
+
+    - name: disable default nginx site
+      file: dest=/etc/nginx/sites-enabled/default state=absent
+      notify: restart nginx
+
+    - name: enable nginx site
+      file: src=/etc/nginx/sites-available/demo dest=/etc/nginx/sites-enabled/demo state=link
+      notify: restart nginx
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted 

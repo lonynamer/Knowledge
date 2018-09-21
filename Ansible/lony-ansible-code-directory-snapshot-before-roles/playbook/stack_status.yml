@@ -1,0 +1,45 @@
+---
+- hosts: webservers
+  become: true
+  tasks:
+    - name: verify apache2 service
+      command: service apache2 status
+
+    - name: check apache listening on port 80
+      wait_for: port=80 timeout=1
+
+- hosts: databases
+  become: true
+  tasks:
+    - name: verify mysql service
+      command: service mysql status
+
+    - name: check mysql listening on port 3306 
+      wait_for: port=3306 timeout=1
+
+- hosts: control
+  tasks:
+    - name: verify end-to-end index response
+      uri: url=http://{{ hostvars[item].ansible_host }} return_content=yes
+      with_items: "{{ groups.loadbalancers }}"
+      register: lb_index
+
+    - fail: msg="index failed to return content"
+      when: "'Hello, from sunny' not in item.content"
+      with_items: "{{lb_index.results}}"
+
+- hosts: loadbalancers
+  become: true
+  tasks:
+    - name: verify nginx service
+      command: service nginx status
+
+    - name: verify end-to-end connection
+      uri: url=http://{{ hostvars[item].ansible_host }} return_content=yes
+      with_items: "{{ groups.webservers }}"
+      register: app_index
+
+    - fail: msg="index failed to return content"
+      when: "'Hello, from sunny' not in item.content"
+      with_items: "{{app_index.results}}"
+
