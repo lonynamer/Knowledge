@@ -529,6 +529,13 @@ $ cat webserver.yml # Add
       notify: restart apache2
 ```
 ```
+$ cat webserver.yml # Add
+
+    - name: copy apache
+      copy: src=demo/demo.conf dest=/etc/apache2/site-available mode=0755
+      notify: restart apache
+```
+```
 $ cat webserver.yml # File
 - hosts: webservers
   become: true
