@@ -700,6 +700,7 @@ upstream demo {
 {% for server in groups.webservers %}
   server {{ server }};
 {% endfor %}
+}
 
 # Nginx conf format
 server {
