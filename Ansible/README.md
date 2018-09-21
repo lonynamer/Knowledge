@@ -102,13 +102,13 @@ ansible --version
 ls /usr/lib/python2.7/dist-packages/ansible/modules/
 ```
 
-### Modules Run Commands
+### Run Commands
 ---
 - `command`: run a OS command directly. (`python dependency on target`)
 - `shell`: running a command by remote shell starting /bin/sh. (`python dependency on target`)
 - `script`: run a script after transfering it. (`python dependency on target`)
 - `raw`: Executes a command without going through the ansible module subsystem. (`no python dependency on target`)
-To work in ansiblist way, don't use `raw` method , as ansible works in a logic to keep the things in a desired state where described in playbooks. The second time you run a playbook, if the description and the infrastructure matching, it will not do nothing. If you do a change and run again, only that change will. Modules are designed by this logic that's why should only be used. Mostly use only ansible modules.
+To work in ansiblist way, don't use non of them unless you don't have a module to do your task. As ansible works in a logic to keep the things in a desired state where described in playbooks. The second time you run a playbook, if the description and the infrastructure matching, it will not do nothing. If you do a change and run again, only that change will. Modules are designed by this logic that's why should only be used. Mostly use only ansible modules.
 - `Raw` method: As an example you can use to check if python is installed in the begging on the target, if not installed, so install and use only modules.
 ---
 
