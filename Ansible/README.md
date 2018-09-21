@@ -2,8 +2,9 @@
 ---
 In the continuation of this workbook, we will install, 3 tiered application by ansible step by step and learn some of the important modules.
 - nginx as loadbalancer
-- apache2 as webserver for serving a python application
-- mysql
+- apache2 as webserver for serving a python application (2)
+- mysql (1)
+- Dependencies: You can do this study project by creating Ubuntu 16.04 instances at AWS. python 2.7 is dependency on each server for ansible. To install on each server. Also you need to enable ssh key authentication from ansible control node to all servers with same key.
 
 ### First of All, What is Ansible ?
 ---
@@ -103,11 +104,12 @@ ls /usr/lib/python2.7/dist-packages/ansible/modules/
 
 ### Modules Run Commands
 ---
-- `command`: run a OS command directly.
-- `shell`: running a command by remote shell starting /bin/sh.
-- `script`: run a script after transfering it.
-- `raw`: Executes a command without going through the ansible module subsystem.
-To work in ansiblist way, don't use non of them, as ansible works in a logic to keep the things in a desired state where described in playbooks. The seond time you run a playbook, if the description and the infrastructure matching, it will not do nothing. If you do a change and run again, only that change will. Modules are designed by this logic that's why should only be used.
+- `command`: run a OS command directly. (`python dependency on target`)
+- `shell`: running a command by remote shell starting /bin/sh. (`python dependency on target`)
+- `script`: run a script after transfering it. (`python dependency on target`)
+- `raw`: Executes a command without going through the ansible module subsystem. (`no python dependency on target`)
+To work in ansiblist way, don't use `raw` method , as ansible works in a logic to keep the things in a desired state where described in playbooks. The second time you run a playbook, if the description and the infrastructure matching, it will not do nothing. If you do a change and run again, only that change will. Modules are designed by this logic that's why should only be used. Mostly use only ansible modules.
+- `Raw` method: As an example you can use to check if python is installed in the begging on the target, if not installed, so install and use only modules.
 ---
 
 ### Ansible.cfg
@@ -117,6 +119,8 @@ $ cat /etc/ansible/ansible.cfg
 
 [defaults]
 inventory=./dev
+#ansible_user=ubuntu
+#private_key_file=~/.ssh/insecure_private_key
 ```
 
 ### Inventory
@@ -259,7 +263,7 @@ app02  ansible_host=<ip_address>
 [databases]
 db01  ansible_host=<ip_address>
 
-[controls]
+[control]
 control ansible_connection=local
 ```
 
@@ -288,7 +292,7 @@ $ cat database.yml # File
 - hosts: databases
   tasks:
     - name: install mysql
-      apt: name=mysql state=present update_cache=yes
+      apt: name=mysql-server state=present update_cache=yes
 ```
 
 ### Packages: become
@@ -306,7 +310,7 @@ $ cat database.yml # File
   become: true
   tasks:
     - name: install mysql
-      apt: name=mysql state=present update_cache=yes
+      apt: name=mysql-server state=present update_cache=yes
 ```
 ```
 ansible-playbook control.yml
@@ -329,7 +333,7 @@ also apt: module is used, in redhat yum:
 ---
 
 ```
-$ cat webserver.yml
+$ cat webserver.yml # File
 
 ---
 - hosts: webservers
@@ -350,7 +354,7 @@ ansible-playbook webserver.yml
 
 ### Service: service
 ```
-$ cat loadbalancer.yml
+$ cat loadbalancer.yml # File
 
 ---
 - hosts: loadbalancers
@@ -358,7 +362,8 @@ $ cat loadbalancer.yml
   - name: install nginx
     apt: name=nginx state=present update_cache=yes
     # removing
-    apt: name=nginx state=absent update_cache=yes
+    #apt: name=nginx state=absent update_cache=yes
+    
   - name: ensure nginx started
     service: name=nginx state=started enabled=yes
     # Stop and disable. Also reload is possible.
@@ -525,7 +530,7 @@ from demo import app as application
 $ cat webserver.yml # Add
 
     - name: copy demo app source
-      copy: src=demo/app dest=/var/www/demo mode=0755
+      copy: src=demo/app/ dest=/var/www/demo mode=0755
       notify: restart apache2
 ```
 ```
@@ -557,7 +562,7 @@ $ cat webserver.yml # File
       notify: restart apache2
 
     - name: copy demo app source
-      copy: src=demo/app dest=/var/www/demo mode=0755
+      copy: src=demo/app/ dest=/var/www/demo mode=0755
       notify: restart apache2
 
     - name: copy apache virtual host config
@@ -579,7 +584,7 @@ ansible-playbook webserver.yml
 $ cat webserver.yml # Add
 
     - name: setup python virtualenv
-      pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/.venv
+      pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo.venv
       notify: restart apache
 ```
 ```
@@ -614,7 +619,7 @@ $ cat webserver.yml # File
       notify: restart apache2
 
     - name: setup python virtualenv
-      pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/.venv
+      pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo/.venv
       notify: restart apache
 
   handlers:
@@ -662,7 +667,7 @@ $ cat webserver.yml # File
       notify: restart apache2
 
     - name: copy demo app source
-      copy: src=demo/app dest=/var/www/demo mode=0755
+      copy: src=demo/app/ dest=/var/www/demo mode=0755
       notify: restart apache2
 
     - name: copy apache virtual host config
@@ -670,7 +675,7 @@ $ cat webserver.yml # File
       notify: restart apache2
 
     - name: setup python virtualenv
-      pip:       requirements=/var/www/demo/requirements.txt virtualenv=/var/www/.venv
+      pip:       requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo/.venv
       notify: restart apache
 
     - name: de-activate default apache site
@@ -768,7 +773,7 @@ $ ansible-playbook loadbalancer.yml
 $ cat database.yml # Add
 
    - name ensure mysql listening on all ports
-     lineinfile: dest=/etc/mysql/my.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
+     lineinfile: dest=/etc/mysql/mysql.conf.d/mysqld.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
      notify restart mysql
 
      handlers: 
@@ -783,18 +788,18 @@ $ cat database.yml # File
   become: true
   tasks:
     - name: install mysql
-      apt: name=mysql state=present update_cache=yes
+      apt: name=mysql-server state=present update_cache=yes
 
     - name: ensure mysql started
       service: name=mysql state=started enabled=yes
 
     - name ensure mysql listening on all ports
-      lineinfile: dest/etc/mysql/my.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
+      lineinfile: dest=/etc/mysql/mysql.conf.d/mysqld.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
       notify restart mysql
 
   handlers: 
   - name: restart mysql
-    service name=mysql status=restarted
+    service name=mysql state=restarted
 ```
 ```
 ansible-playbook database.yml
@@ -827,7 +832,7 @@ $ cat database.yml # File
       service: name=mysql state=started enabled=yes
 
     - name ensure mysql listening on all ports
-      lineinfile: dest/etc/mysql/my.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
+      lineinfile: dest=/etc/mysql/mysql.conf.d/mysqld.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
       notify restart mysql
 
     - name create demo database
@@ -873,7 +878,7 @@ $ cat playbooks/stack_status.yml # File
       command: service mysql status
 
     - name: check mysql listening on 3306
-      wait_for: port: 3306 timeout=1
+      wait_for: port=3306 timeout=1
 ```
 ```
 ansible-playbook playbooks/stack_status.yml
@@ -982,9 +987,8 @@ $ cat loadbalancer.yml # File
   handlers:
     - name: restart nginx
       service: name=nginx state=restarted
-
-Add python_httplib2 to control nodes
 ```
+Add python_httplib2 to control nodes
 ```
 $ cat control.yml # Add
 
@@ -1154,7 +1158,7 @@ $ cat roles/mysql/tasks/main.yml
       service: name=mysql state=started enabled=yes
 
     - name ensure mysql listening on all ports
-      lineinfile: dest/etc/mysql/my.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
+      lineinfile: dest=/etc/mysql/mysql.conf.d/mysqld.cnf regexp=^bind-address line="bind-address = 0.0.0.0"
       notify restart mysql
 
     - name create demo database
@@ -1352,7 +1356,7 @@ A section from roles/mysql/main.yml. Using variable from facts inside yaml to ch
 $ cat roles/mysql/tasks/main.yml
 
 - name: ensure mysql listening on all ports
-  lineinfile: dest=/etc/mysql/my.cnf regexp=^bind-address
+  lineinfile: dest=/etc/mysql/mysql.conf.d/mysqld.cnf regexp=^bind-address
               line="bind-address = {{ ansible_eth0.ip4.address }}"
 ```
 ```
