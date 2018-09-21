@@ -874,13 +874,6 @@ $ cat playbooks/stack_status.yml # File
 
     - name: check mysql listening on 3306
       wait_for: port: 3306 timeout=1
-
-- hosts: control
-  tasks:
-    - name: verify end-to-end response
-      uri: url=http://{{item}} return_content=yes
-      with_items: groups.loadbalancers
-      register: lb_index
 ```
 ```
 ansible-playbook playbooks/stack_status.yml
@@ -1039,91 +1032,49 @@ $ cat playbooks/stack_status.yml # Add
 ```
 $ cat playbooks/stack_status.yml # File
 
----
+---- hosts: webservers
+  become: true
+  tasks:
+    - name: verify apache2 service
+      command: service apache2 status
+
+    - name: check apache listening on port 80
+      wait_for: port=80 timeout=1
+
+- hosts: databases
+  become: true
+  tasks:
+    - name: verify mysql service
+      command: service mysql status
+
+    - name: check mysql listening on port 3306
+      wait_for: port=3306 timeout=1
+
+- hosts: control
+  tasks:
+    - name: verify end-to-end index response
+      uri: url=http://{{ hostvars[item].ansible_host }} return_content=yes
+      with_items: "{{ groups.loadbalancers }}"
+      register: lb_index
+
+    - fail: msg="index failed to return content"
+      when: "'Hello, from sunny' not in item.content"
+      with_items: "{{lb_index.results}}"
+
 - hosts: loadbalancers
   become: true
   tasks:
     - name: verify nginx service
       command: service nginx status
 
-- hosts: webservers
-  become: true
-  tasks:
-    - name: verify apache2 service
-      command: service apache2 status
-
-    - name: verify apache2 listening on 80
-      wait_for: port=80 timeout=1
-
-- hosts: databases
-  become: true
-  tasks:
-    - name: verify mysql is running
-      command: service mysql status
-
-    - name: check mysql listening on 3306
-      wait_for: port: 3306 timeout=1
-
-- hosts: control
-  tasks:
-    - name: verify end-to-end response
-      uri: url=http://{{item}} return_content=yes
-      with_items: groups.loadbalancers
-      register: lb_index
-
-# for loadbalancers response
-- hosts: control
-  tasks:
-    - name: verify end-to-end response
+    - name: verify end-to-end connection
       uri: url=http://{{ hostvars[item].ansible_host }} return_content=yes
-      with_items: {{ groups.loadbalancers }}
-      register: lb_index
+      with_items: "{{ groups.webservers }}"
+      register: app_index
 
     - fail: msg="index failed to return content"
       when: "'Hello, from sunny' not in item.content"
-      with_items "{{lb_index.results}}"
-
-# for webservers response
-- hosts: loadbalancers
-  tasks:
-    - name: verify end-to-end response
-      uri: url=http://{{ hostvars[item].ansible_host }} return_content=yes
-      with_items: {{ groups.webservers }}
-      # content output
-      register: app_index
-
-      # fail
-    - fail: msg="index failed to return content"
-      # when to fail, if no error, it will skip the fail.
-      when: "'Hello, from sunny' not in item.content"
-      with_items "{{app_index.results}}"
-
-# for loadbalancers database response
-- hosts: control
-  tasks:
-    - name: verify end-to-end response
-      uri: url=http://{{item}} return_content=yes
-      with_items: groups.loadbalancers
-      register: lb_db_index
-
-    - fail: msg="index failed to return content from db"
-      when: "'A text that comes from database' not in item.content"
-      with_items "{{lb_db_index.results}}"
-
-# for webservers database response
-- hosts: webservers
-  tasks:
-    - name: verify end-to-end response
-      uri: url=http://{{item}} return_content=yes
-      with_items: groups.loadbalancers
-      # content output
-      register: app_index
-
-      # fail
-    - fail: msg="index failed to return content from db"
-      # when to fail, if no error, it will skip the fail.
-      when: "'A text that comes from database' not in item.content"
-      with_items "{{app_index.results}}"
+      with_items: "{{app_index.results}}"
 ```
 
 ### Roles
