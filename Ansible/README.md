@@ -693,12 +693,31 @@ ansible-playbook webserver.yml
 $ mkdir templates
 
 ```
-$ cat templates/nginx.conf.j2 # File
+# DON'T USE THIS, JUST A JINJA2 EXAMPLE
 
 # Jinja format loop upstream
 upstream demo {
 {% for server in groups.webservers %}
   server {{ server }};
+{% endfor %}
+}
+
+# Nginx conf format
+server {
+  listen 80;
+  location / {
+    proxy_pass http://demo;
+  }
+}
+```
+```
+$ cat templates/nginx.conf.j2 # File # USE THIS
+
+# Jinja format loop upstream
+upstream demo {
+{% for server in groups.webservers %}
+#  server {{ server }};
+  server {{ hostvars[server].ansible_host }};
 {% endfor %}
 }
 
