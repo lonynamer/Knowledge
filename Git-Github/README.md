@@ -150,11 +150,11 @@ Output:
  1 file changed, 1 insertion(+)
 ```
 
-##### SHOW COMMITS
-`git log`
--
-Will show you all commits in the current branch(master)
--
+##### SHOW COMMITS ON THE CURRENT BRANCH
+```
+git log
+```
+Output:
 ```
 commit 3ec5d239ffde3cdb02d2a2740b738d8592afee13 (HEAD -> master)
 Author: Lony Namer <namer.lony@gmail.com>
