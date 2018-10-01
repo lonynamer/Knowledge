@@ -1,118 +1,122 @@
-JOHNB - GIT
-18.197.145.170
-20	לוני נמר	ubuntu	https://s3.eu-central-1.amazonaws.com/jb-artifacts/jb_ubuntu.pem	18.197.145.170
 
 
-- Open Github Account
-https://github.com/GabrielWM/JB-SSH/blob/master/jb-cours-ssh.xlsx
-
-
-- INSTALL
+### INSTALL GIT
+On Ubuntu/Debian
+```
 apt-get update
 apt-get install git-core
+apt-get install git  # Also fine.
+```
+On Centos
+```
+yum install git
+```
+On Windows
+```
+- Download from https://git-scm.com/download/win
+- Install full and use `Git Bash` which is recommended.
+- You can also use `Git CMD` or `Git GUI`
+```
 
-- CONFIGURE YOUR IDENTITY
-root@ip-172-31-46-163:~# git config --global user.name "Lony Namer"
-root@ip-172-31-46-163:~# git config --global user.email "namer.lony@gmail.com"
+### OPEN A FREE GITHUB ACCOUNT
+---
+- https://github.com
+- Follow the steps and create an account by default addresses as https://github.com/your-username
+- You can also use bitbucket. 
+---
 
-- Create Repository 
-root@ip-172-31-46-163:~# cd /mygitrepo/
-root@ip-172-31-46-163:/mygitrepo# git init
-Initialized empty Git repository in /mygitrepo/.git/
+### What is GIT ?
+---
+- Git is a multi-branched distributed source control management system developed by Linus Tovarlds.
+- The main difference from SVN is; it's snapshot file system structure instead of using directories and duplicates under branches.
+- By this property and some compression methodologies reduces the data size drastically.
+- As data size is reduced; In Git world, developers don't work in front of a server, each developer `clone` the whole remote repository as local repository.
+- Developers work on local repo and can `pull` others changes and `push` their changes.
+- This way the source code is distributed and also collaborative. 
+- `Master` is the main branch. Source code can be branched like `Development`, `Staging`, `Feature`, `BugFix`, `Release` for different scenarios of code change.
+- This is the recommended way to work.
+- In the end, changes from the branches can be merged to another branches and `tag` as a version can be done.
+- All this changes collaboratively can be pushed to a remote origin server.
+- Once a repository is cloned only chages will be pushed or pulled and it will work light-weight.
+---
 
-root@ip-172-31-46-163:/mygitrepo# cat /root/.gitconfig
+### What is GITHUB ?
+---
+- `GITHUB` is a remote git repository for open-source projects.
+- `BitBucket` is a competitor with same principles.
+- `GitLab`, `GitHub Enterprice` are some other solutions.
+- For creating private repositories.
+- For Organizations, you need to use `GitHub Enterprice`, `BitBucket Enterprise`, maybe `GitLab` for having more control on security, privacy, authorization, repository and branch permissions.
+- Another option may be using LDAP with ssh or https.
+- GIT can contact remote repo over ssh or https securely.
+---
+
+### GIT REPOSITORY SECTIONS AND STATES
+---
+- States: `Untracked` `Tracked` `Modified` `Unmodified`
+- Sections: `Workspace` `Staging Area` `Commit Area`
+- A local repository is just a directory initialized specially by `.git` directory.
+- By default the files are `untracked` under your `workspace` where you see the files.
+- You have to add the file/s or dir/s to `staging area`, so the changes will be tracked.
+- When you `commit` only the files in `tracked` and `modified` status will be commited to `Commit Area`
+- When do `push` to remote origin repo, those committed changes will be pushed to remote repo.
+- It's adviced to do a `pull` to have, all the changes of others first to solve conflicts and then push to central repository.
+- Listing, deleting, removing, rollback from staging area or commits all possible from on all branches.
+---
+
+### CONFIGURE YOUR LOCAL IDENTITY
+```
+git config --global user.name "Lony Namer"
+git config --global user.email "namer.lony@gmail.com"
+```
+- This configuration will create a .gitconfig file under your home directory like below.
+$ cat /home/ubuntu/.gitconfig
+```
 [user]
         name = Lony Namer
         email = namer.lony@gmail.com
+```
 
+### Create A Empty Local Repository `mygitrepo`
+```
+cd ~ 
+mkdir mygitrepo
+cd mygitrepo
+git init
+```
+`Initialized empty Git repository in /mygitrepo/.git/`
 
+### CREATE AND ADD FILES TO STAGING AREA
+```
+touch file1 file2 file3
+mkdir test
+touch test/test1 
+git add file1   # Add file
+git add .       # Add All Files
+```
 
-- Clone locally
-root@ip-172-31-46-163:/mygitrepo# git clone git@bitbucket.org:automatitdevops/country/country.git
-
-# git status # (will show what changed.)
-
-Git Area divided to 3 sections  in localrepo
-- Working Directory: Files. change files but did a change on a file but don't want it on staging
-# git add file (adds to staging)
-# git checkout file (removes from staging)
-- Stage: From working dir moves to staging and commit works on staging.
-# git commit -m "explenation" # (adds to repository)
-- Repository
-
-# git push # (push to remote)
-# git pull # (pull from remote)
-
-
-
-> git add . 
-> git reset HEAD . 
-
------------------------------
-
-# Clone
-git clone https://github.com/zivkashtan/course.git
-
-- Remove Origin
-ubuntu@ip-172-31-46-163:~/mygitrepo$ git remote remove origin
-- Add Origin
-$ git remote add origin https://github.com/lonynamer/time-tracker.git
-- Push Origin
-$ git push --all origin
-Username for 'https://github.com': lonynamer
-Password for 'https://lonynamer@github.com':
-Counting objects: 51, done.
-Delta compression using up to 2 threads.
-Compressing objects: 100% (32/32), done.
-Writing objects: 100% (51/51), 11.02 KiB | 0 bytes/s, done.
-Total 51 (delta 7), reused 0 (delta 0)
-remote: Resolving deltas: 100% (7/7), done.
-To https://github.com/lonynamer/time-tracker.git
- * [new branch]      master -> master
-
-
-- Create 2 file
-$ echo "I am a Git Overlord there!" > test.txt
-$ echo "I am a Git Overlord there!" > test1.txt
-- Status shows 2 untracked files
-$ git status
+### SHOW STAGED(TRACKED) FILES
+`git status`
+```
 On branch master
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-- Add to Staging
-$ git add test.txt
-- Remove from Staging
-$ git reset HEAD test.txt
-$ git add .
--  -a commit and add but adds change, new files you have to do add. -m message 
-$ git commit -a -m "The changes I did."
-$ git push --all origin
-- show origin
-$ git remote show origin
 
-*** BRANCHING
-*** Branch > Snapshots. ordered sets of commits. Whenever you do commit, Master points to last brach.
-*** You can create branch without changes. 
-A brach will point to my new branch and master will point to my last change. 
-When you turn back from branch A, you turn back to situation in M.
+No commits yet
 
-- Creates new branch if exists, else it creates new.
-$ git checkout -b new_web_handler
-- List branches locally 
-$ git branch -a
-- Push Branch to upstream
-$ git push origin test_feature
-$ git push --set-upstream origin
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
 
-**** Merging
-- You create branch of master, create target branch merge and solve conflicts and merge to master
+        new file:   file1
+        new file:   file2
+        new file:   file3
+        new file:   test/test1
+```
 
-
-aws cloudformation create-stack \
-  --region eu-west-1 \
-  --stack-name "GitHubTrial" \
-  --template-url https://github-enterprise.s3.amazonaws.com/cloudformation/trial-1533312825.template \
-  --parameters ParameterKey=Instance,ParameterValue=r3.large \
-               ParameterKey=Data,ParameterValue=50
-
-
+### REMOVE FILES FROM STAGING
+```
+git reset HEAD -- file1   # File or directory
+git reset HEAD -- .       # All
+```
+Do a `git status`, you will see that files are not tracked(staged)
+```
+git status
+```
