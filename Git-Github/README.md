@@ -27,12 +27,15 @@
 
 ##### GIT REPOSITORY SECTIONS AND STATES
 ---
-- States: `Untracked` `Tracked` `Modified` `Unmodified`
+- States: `Untracked` `Tracked` `Modified` `Unmodified` `Staged`
 - Sections: `Workspace` `Staging Area` `Commit Area`
 - A local repository is just a directory initialized specially by `.git` directory.
 - By default the files are `untracked` under your `workspace` where you see the files.
-- You have to add the file/s or dir/s to `staging area`, so the changes will be tracked.
-- When you `commit` only the files in `tracked` and `modified` status will be commited to `Commit Area`
+- You have to add the file/s or dir/s to `staging area`, so the changes will be tracked and files will be staged.
+- When you do a change to a `Staged` file, it's state will change to `Modified`
+- A modified file should be `Staged` by `add` again or `-a` flag of `commit` handles this.
+- `-a` flag does not handle newly added files.
+- When you `commit` only the files in `tracked` and `staged` status will be commited to `Commit Area`
 - When do `push` to remote origin repo, those committed changes will be pushed to remote repo.
 - It's adviced to do a `pull` to have, all the changes of others first to solve conflicts and then push to central repository.
 - Listing, deleting, removing, rollback from staging area or commits all possible from on all branches.
@@ -94,7 +97,7 @@ git add file1   # Add file
 git add .       # Add All Files
 ```
 
-##### SHOW STAGED(TRACKED) FILES
+##### SHOW STAGED FILES
 `git status`
 ```
 On branch master
@@ -115,7 +118,34 @@ Changes to be committed:
 git reset HEAD -- file1   # File or directory
 git reset HEAD -- .       # All
 ```
-Do a `git status`, you will see that files are not tracked(staged)
+Do a `git status`, you will see that files are not tracked or staged.
 ```
 git status
 ```
+
+##### COMMIT AND SAVE CHANGES
+---
+- `commit` means saving a snapshot of tracked and staged files.
+- Before doing `commit`, you need to add the file to stagin as above.
+- `Tracked` and `Staged` donot mean the same. 
+- If a file is `Tracked` but `Modified` later, you need to stage it again.
+- `-m` flag is message, plain text description of the changes. Always describe the changes.
+---
+Have to use `add` for new files.
+```
+git add .    
+git commit -m "Added all the files."
+```
+If files are only modified.
+```
+echo "test modification" >> file1
+```
+This will handle the changes.
+```
+git commit -a -m "file1 changed, new line added."
+```
+
+
+
+
+
