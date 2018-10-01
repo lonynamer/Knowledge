@@ -152,7 +152,9 @@ Output:
 
 ##### SHOW COMMITS
 `git log`
+---
 Will show you all commits in the current branch(master)
+---
 ```
 commit 3ec5d239ffde3cdb02d2a2740b738d8592afee13 (HEAD -> master)
 Author: Lony Namer <namer.lony@gmail.com>
