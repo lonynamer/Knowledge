@@ -144,6 +144,28 @@ This will handle the changes.
 ```
 git commit -a -m "file1 changed, new line added."
 ```
+Output:
+```
+[master 3ec5d23] file1 changed, new line added.
+ 1 file changed, 1 insertion(+)
+```
+
+##### SHOW COMMITS
+`git log`
+Will show you all commits in the current branch(master)
+```
+commit 3ec5d239ffde3cdb02d2a2740b738d8592afee13 (HEAD -> master)
+Author: Lony Namer <namer.lony@gmail.com>
+Date:   Mon Oct 1 22:35:19 2018 +0300
+
+    file1 changed, new line added.
+
+commit 43ddfc4c8eed65cf950e1067c16e42b53e03b39c
+Author: Lony Namer <namer.lony@gmail.com>
+Date:   Mon Oct 1 22:32:12 2018 +0300
+
+    All files added.
+```
 
 
 
