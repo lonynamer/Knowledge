@@ -169,6 +169,10 @@ Date:   Mon Oct 1 22:32:12 2018 +0300
     All files added.
 ```
 
+##### CREATE AND EMPTY REMOTE REPOSITORY  AT GITHUB (Don't Initialize) AND PUSH THE CHANGES
+- https://github.com/username/reponame
+- Mine: https://github.com/lonynamer/mygitrepo
+
 
 
 
