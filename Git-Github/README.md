@@ -173,15 +173,49 @@ Date:   Mon Oct 1 22:32:12 2018 +0300
 ---
 - https://github.com/username/reponame
 - Mine: https://github.com/lonynamer/mygitrepo
+- `origin` is just a label, you can set different.
 ---
 - Add remote repository 
 ```
 git add remote origin https://github.com/lonynamer/mygitrepo.git
+# OR
+git add remote origin git@github.com:lonynamer/mygitrepo.git
 ```
-- Push the changes
+- Push the changes. As it's the first time and remote repo has no branches even master. Credentials required.
 ```
-git push re
+ git push --set-upstream origin master
 ```
+- Next time, you can push the changes like this.
+```
+git push
+```
+##### SHOW REMOTE REPOS
+```
+git remote show
+```
+Output:
+```
+origin
+```
+```
+git remote show origin
+```
+Output:
+```
+git remote show origin
+* remote origin
+  Fetch URL: https://github.com/lonynamer/mygitrepo.git
+  Push  URL: https://github.com/lonynamer/mygitrepo.git
+  HEAD branch: master
+  Remote branch:
+    master tracked
+  Local branch configured for 'git pull':
+    master merges with remote master
+  Local ref configured for 'git push':
+    master pushes to master (up to date)
+```
+
+
 
 
 
