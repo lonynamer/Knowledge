@@ -204,6 +204,15 @@ git add remote origin git@github.com:lonynamer/mygitrepo.git
 ```
 git push
 ```
+- Pushing all the branches first time to empty repo.
+```
+git push --all --set-upstream origin
+```
+- Pushing all the branches
+```
+git push --all
+```
+
 ##### SHOW REMOTE REPOS
 ```
 git remote show
@@ -230,61 +239,47 @@ git remote show origin
     master pushes to master (up to date)
 ```
 
+##### BRANCHING AND CHECKOUT
+- Creating a branch from other branch means getting ordered set of commits getting under another branch.
+- Create a brach
+```
+git branch development
+```
+- List the branches
+```
+git branch -a
+```
+- Checkout to branch
+```
+git checkout development
+```
+- Create a branch and checkout.
+```
+git checkout -b development
+```
+- Push a branch
+```
+git push origin development
+```
 
+##### MERGING
+- Creating branch of master, create target branch merge, solving conflicts and merging back to master is a good practice.
+```
+git checkout master
+git merge development
+```
+It will ask the merge reason vi style. After `:wq!` `development` branch will be merged to `master` .
 
-# Clone
-git clone https://github.com/zivkashtan/course.git
-
-- Remove Origin
-ubuntu@ip-172-31-46-163:~/mygitrepo$ git remote remove origin
-- Add Origin
-$ git remote add origin https://github.com/lonynamer/time-tracker.git
-- Push Origin
-$ git push --all origin
-Username for 'https://github.com': lonynamer
-Password for 'https://lonynamer@github.com':
-Counting objects: 51, done.
-Delta compression using up to 2 threads.
-Compressing objects: 100% (32/32), done.
-Writing objects: 100% (51/51), 11.02 KiB | 0 bytes/s, done.
-Total 51 (delta 7), reused 0 (delta 0)
-remote: Resolving deltas: 100% (7/7), done.
-To https://github.com/lonynamer/time-tracker.git
- * [new branch]      master -> master
-
-
-
-- Remove from Staging
-$ git reset HEAD test.txt
-$ git add .
--  -a commit and add but adds change, new files you have to do add. -m message 
-$ git commit -a -m "The changes I did."
-$ git push --all origin
-- show origin
-$ git remote show origin
-
-
-
-*** BRANCHING
-*** Branch > Snapshots. ordered sets of commits. Whenever you do commit, Master points to last brach.
-*** You can create branch without changes. 
-A brach will point to my new branch and master will point to my last change. 
-When you turn back from branch A, you turn back to situation in M.
-
-- Creates new branch if exists, else it creates new.
-$ git checkout -b new_web_handler
-- List branches locally 
-$ git branch -a
-- Push Branch to upstream
-$ git push origin test_feature
-$ git push --set-upstream origin
-
-**** Merging
-- You create branch of master, create target branch merge and solve conflicts and merge to master
-
-
-
-
+##### CLONE A REMOTE REPO
+- Just for testing remove the local repository. Clone back from remote repo.
+```
+cd ~
+rm -rf mygitrepo
+git clone https://github.com/lonynamer/mygitrepo
+# After Cloning, Check
+cd mygitrepo
+git remote show origin
+```
 
 ##### REVERT BACK TO A COMMIT AND DELETE ALL HISTORY AFTER
 ---
