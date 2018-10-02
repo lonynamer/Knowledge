@@ -35,6 +35,7 @@
 - When you do a change to a `Staged` file, it's state will change to `Modified`
 - A modified file should be `Staged` by `add` again or `-a` flag of `commit` handles this.
 - `-a` flag does not handle newly added files.
+- When you delete a file also need to use `-a` flag of commit.
 - When you `commit` only the files in `tracked` and `staged` status will be commited to `Commit Area`
 - When do `push` to remote origin repo, those committed changes will be pushed to remote repo.
 - It's adviced to do a `pull` to have, all the changes of others first to solve conflicts and then push to central repository.
@@ -57,6 +58,20 @@ On Windows
 - Download from https://git-scm.com/download/win
 - Install full and use `Git Bash` which is recommended.
 - You can also use `Git CMD` or `Git GUI`
+```
+
+##### INSTALLING GITHUB ENTERPRISE ON AWS
+---
+- We will use regular free Github. Can install just to learn later.
+- https://enterprise.github.com/resources
+---
+```
+aws cloudformation create-stack \
+  --region eu-west-1 \
+  --stack-name "GitHubTrial" \
+  --template-url https://github-enterprise.s3.amazonaws.com/cloudformation/trial-1533312825.template \
+  --parameters ParameterKey=Instance,ParameterValue=r3.large \
+               ParameterKey=Data,ParameterValue=50
 ```
 
 ##### OPEN A FREE GITHUB ACCOUNT
@@ -217,6 +232,87 @@ git remote show origin
 
 
 
+# Clone
+git clone https://github.com/zivkashtan/course.git
+
+- Remove Origin
+ubuntu@ip-172-31-46-163:~/mygitrepo$ git remote remove origin
+- Add Origin
+$ git remote add origin https://github.com/lonynamer/time-tracker.git
+- Push Origin
+$ git push --all origin
+Username for 'https://github.com': lonynamer
+Password for 'https://lonynamer@github.com':
+Counting objects: 51, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (32/32), done.
+Writing objects: 100% (51/51), 11.02 KiB | 0 bytes/s, done.
+Total 51 (delta 7), reused 0 (delta 0)
+remote: Resolving deltas: 100% (7/7), done.
+To https://github.com/lonynamer/time-tracker.git
+ * [new branch]      master -> master
 
 
 
+- Remove from Staging
+$ git reset HEAD test.txt
+$ git add .
+-  -a commit and add but adds change, new files you have to do add. -m message 
+$ git commit -a -m "The changes I did."
+$ git push --all origin
+- show origin
+$ git remote show origin
+
+
+
+*** BRANCHING
+*** Branch > Snapshots. ordered sets of commits. Whenever you do commit, Master points to last brach.
+*** You can create branch without changes. 
+A brach will point to my new branch and master will point to my last change. 
+When you turn back from branch A, you turn back to situation in M.
+
+- Creates new branch if exists, else it creates new.
+$ git checkout -b new_web_handler
+- List branches locally 
+$ git branch -a
+- Push Branch to upstream
+$ git push origin test_feature
+$ git push --set-upstream origin
+
+**** Merging
+- You create branch of master, create target branch merge and solve conflicts and merge to master
+
+
+
+
+
+##### REVERT BACK TO A COMMIT AND DELETE ALL HISTORY AFTER
+---
+- This will delete the commit history after the point you rolled-back.
+- So be carefull.
+- When you use this, create a new branch, rollback in the new branch and merge to the original branch.
+---
+```
+git reset --hard f414f31
+```
+
+##### REVERT BACK BY CREATING A NEW COMMIT FROM AN OLD COMMIT 
+- This one also adviced by using a bracnh.
+```
+git reset --hard f414f31
+git reset --soft HEAD@{1}
+git commit -m "Roll Back To f414f31 and new commit."
+```
+
+##### CLEAN UNTRACKED FILES
+---
+- First see what will be removed
+- It may clean also ignored files as 
+---
+```
+git clean -n
+```
+- Delete
+```
+git clean -f
+```
