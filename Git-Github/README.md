@@ -454,4 +454,94 @@ git config --global --edit
 vi ~/.gitconfig
 ```
 
+##### git logalias
+- Decorating to view the branches better
+```
+alias g="git log --decorate --graph --oneline"
+g
+# You can add more flags after the `g` alias
+```
+- Show commit with number of limit.
+```
+git log -5
+```
+- Each commit in one line and short hash.
+```
+git log --oneline
+```
+- Display full `diff` on each commit
+```
+git log -p
+```
+- Show commits, include file altered, added or deleted from each of them.
+```
+git log --stat
+```
+- git log show commits by author
+```
+git log --author"PATTERN"
+```
+- git log show commits by `grep`ing the commit message
+```
+git log --grep="PATTERN"
+```
+- git log show commits by date
+```
+git log since..until
+```
+- git log show commits only having a specified file
+```
+git log -- filename
+```
 
+##### git diff
+- Show difference between current working directory and last commit.
+```
+git diff HEAD
+```
+- Show difference between staged changes and last commit. 
+```
+git diff --cached
+```
+
+##### git reset
+- Reset staging area to match last commit but keep working area.
+```
+git reset
+```
+- Reset staging area and working directory to match last commit. Does not delete untracked files.
+```
+git reset --hard
+```
+- Move current branch backward to a commit. Reset staging area to match but leave working directory.
+```
+git reset 19e7f08
+```
+- Move current branch to a commit. Reset staging area and working directory to match last commit. Does not delete untracked files. It will destroy all commits forward.
+```
+git reset --hard 19e7f08
+```
+
+##### git rebase
+- Rebase current branch to another branch or commit. Get the changes.
+```
+git rebase -i <base>
+```
+- Git pull rebase, rebases the current branch with a remote repo
+```
+git pull --rebase origin
+```
+
+##### git push
+- Push even the results in a non-fast-forward merge. Don't use force unless you don't know what you do.
+```
+git push origin --force
+```
+- Push all branches
+```
+git push origin --all
+```
+- Push tags
+```
+git push origin --tags
+```
