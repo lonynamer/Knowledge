@@ -184,6 +184,8 @@ Changes to be committed:
 
 ##### REMOVE FILES FROM STAGING
 ```
+git rm --cached file1
+# OR
 git reset HEAD -- file1   # File or directory
 git reset HEAD -- .       # All
 ```
@@ -237,6 +239,12 @@ Date:   Mon Oct 1 22:32:12 2018 +0300
 
     All files added.
 ```
+
+##### .gitignore file
+---
+- Is a list of files, directories or regexps to ignore files in commits. Each pattern should be written under the one before.
+- You have to stage and commit .gitignore file as well under root of the repository.
+---
 
 ##### CREATE AN EMPTY REMOTE REPOSITORY  AT GITHUB (Don't Initialize) AND PUSH THE CHANGES
 ---
