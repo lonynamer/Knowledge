@@ -284,6 +284,21 @@ git merge development
 ```
 It will ask the merge reason vi style. After `:wq!` `development` branch will be merged to `master` .
 
+##### CHERRY PICKING
+- Choosing a commit from a branch and applying to another branch without the whole commit history.
+```
+git cherry-pick 08bdf23bcebdab929884d6f1f2ed3e0f797831d2
+# OR (IF cherry picking a public commit.)
+git cherry-pick -x 08bdf23bcebdab929884d6f1f2ed3e0f797831d2
+```
+- Cherry-pick do not copy the notes. So you have to do manually like.
+```
+git notes 08bdf23bcebdab929884d6f1f2ed3e0f797831d2 08bdf23bcebdab929884d6f1f2ed3e0f7978323er
+```
+
+##### SQUASHING
+- Taking a set of historical commits and converting to a one commit.
+
 ##### CLONE A REMOTE REPO
 - Just for testing remove the local repository. Clone back from remote repo.
 ```
@@ -553,4 +568,30 @@ git push origin --all
 - Push tags
 ```
 git push origin --tags
+```
+
+##### git tag
+- You can tag a commit as version and a message. Tags are global and not related to a branch. Publish.
+```
+git tag v.2.1.2
+```
+- Show tags
+```
+git tag
+```
+- Delete a tag
+```
+git tag -d v.2.1.2
+```
+- Tag a commit
+```
+git tag -a v1.2 9fceb02
+```
+- Show tag, commit relation together
+```
+git show-ref --tags
+```
+- Show tags on remote repository
+```
+git ls-remote --tags origin
 ```
