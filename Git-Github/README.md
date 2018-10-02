@@ -30,10 +30,51 @@
 - `GitLab`, `GitHub Enterprice` are some other solutions.
 - For creating private repositories.
 - For Organizations, you need to use `GitHub Enterprice`, `BitBucket Enterprise`, maybe `GitLab` for having more control on security, privacy, authorization, repository and branch permissions.
-
+- Github Enterprise provides additional feature like `access control`, `bug tracking`,`feature requests`,`task management` and `wikis` for every project. 
+- As an example `Gitlab` is out of being an SCM, is a complete `CI` solution.
 - Another option may be using LDAP with ssh or https.
 - GIT can contact remote repo over ssh or https securely.
 ---
+
+### WORKFLOWS
+##### Centralized
+- Pushing changes into one branch. Not adviced.
+##### Feature Branch
+- All the development occurs in a secondary branch and changes are merged to master. Better but there is a better one.
+##### Gitflow
+---
+- The most commonly used and advices flow type.
+- This Mandatory Branches Should Be Created: Master, Develop, Release, Feature Branches, Hotfix
+- Develop: Main Branch to integrate features from Feature Brances.
+- Release: Every Release should have it's own branch.
+- Feature: Each feature should have it's own branch.
+- Hotfix: Every hotfix of a bug should have it's own branch.
+`Hotfixes` are merged back to `Master`, `Features` are merged to `Development`, `Development` merged to `Release`, in the end `Release` is merged the `Master` and tagged. 
+---
+##### FORKING
+- Fundementally different than other workflows. In this scenario, every developer has it's own local and remote repository.
+
+### GITFLOW EXTENSIONS
+---
+- A set of git extensions to provide high-level repository operations for Gitflow banching model
+- https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
+---
+
+### Pull Requests
+---
+- Are requests for informing other developers to pull the updated bracnch from a repository. 
+- 4 pieces of information necessary, `Source Repository`,`Source Branch`,`Target Repository`,`Target Branch`.
+- It cannot be applied to FORKING workflow as there is no central repository. 
+---
+
+### Webhooks & Events
+---
+- Webhook is a way for notifying external systems, CI tools like Jenkins when an even occurs. 
+- In Jenkins example, once an event occurs in the central repository, GitHub will hook a web page create at Jenkins and trigger a task.
+- There are around 37 events can be configure for webhook.
+---
+
+
 
 ##### GIT REPOSITORY SECTIONS AND STATES
 ---
@@ -102,6 +143,10 @@ $ cat /home/ubuntu/.gitconfig
 [user]
         name = Lony Namer
         email = namer.lony@gmail.com
+```
+- List the configurations
+```
+git config list
 ```
 
 ##### CREATE AND EMPTY LOCAL REPOSITORY `mygitrepo`
