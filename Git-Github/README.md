@@ -58,6 +58,7 @@
 ---
 - A set of git extensions to provide high-level repository operations for Gitflow banching model
 - https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
+- https://danielkummer.github.io/git-flow-cheatsheet/
 ---
 
 ### Pull Requests
@@ -73,8 +74,6 @@
 - In Jenkins example, once an event occurs in the central repository, GitHub will hook a web page create at Jenkins and trigger a task.
 - There are around 37 events can be configure for webhook.
 ---
-
-
 
 ##### GIT REPOSITORY SECTIONS AND STATES
 ---
