@@ -109,6 +109,12 @@ On Windows
 - Install full and use `Git Bash` which is recommended.
 - You can also use `Git CMD` or `Git GUI`
 ```
+- HELP
+```
+git --help
+git help add
+git add --help
+```
 
 ##### INSTALLING GITHUB ENTERPRISE ON AWS
 ---
