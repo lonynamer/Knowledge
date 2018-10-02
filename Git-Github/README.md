@@ -30,6 +30,7 @@
 - `GitLab`, `GitHub Enterprice` are some other solutions.
 - For creating private repositories.
 - For Organizations, you need to use `GitHub Enterprice`, `BitBucket Enterprise`, maybe `GitLab` for having more control on security, privacy, authorization, repository and branch permissions.
+
 - Another option may be using LDAP with ssh or https.
 - GIT can contact remote repo over ssh or https securely.
 ---
@@ -270,6 +271,10 @@ git checkout -b development
 ```
 git push origin development
 ```
+- Delete a branch
+```
+git branch -d development
+```
 
 ##### MERGING
 - Creating branch of master, create target branch merge, solving conflicts and merging back to master is a good practice.
@@ -403,6 +408,10 @@ git checkout -b branchname
 ```
 git merge branchname
 ```
+- Delete a branch
+```
+git branch -d development
+```
 
 ##### Remote Repositories
 - Add a remote repo.
@@ -454,7 +463,7 @@ git config --global --edit
 vi ~/.gitconfig
 ```
 
-##### git logalias
+##### git log
 - Decorating to view the branches better
 ```
 alias g="git log --decorate --graph --oneline"
