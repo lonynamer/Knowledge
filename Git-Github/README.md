@@ -317,3 +317,132 @@ git clean -n
 git clean -f
 ```
 
+
+### GIT CHEAT SHEAT
+
+##### Git Basics
+- Create empty git repo
+```
+git init directoryname
+```
+- Clone a remote repo
+```
+git clone https://github.com/lonynamer/mygitrepo
+```
+- Stage a file or directory
+```
+git add directoryname
+# All file in currect directory
+git add .
+```
+- Commit
+```
+git commit -m "Change description message"
+# By adding changed files.
+git commit -a -m "Change description message"
+```
+- List staged, unstaged and untracked files.
+```
+git status
+```
+- Display commit history
+```
+git log
+```
+- Show unstaged changes between working directory and index
+```
+git diff
+```
+
+##### Undoing Changes
+- Create a new commit that undoes the changes in a commit.
+```
+git revert 08bdf23bcebdab929884d6f1f2ed3e0f797831d2
+```
+- Remove a file from staging but leave in working dir.
+```
+git reset myfile
+# All Files
+git reset .
+```
+
+##### Rewriting Git History
+- Replace last commit with staged changes and last commit combined.
+```
+git commit --ammend
+```
+- Rebase current branch. It can be commit id, branch, tag, or relative reference to HEAD.
+```
+git rebase master
+# OR 
+git rebase 08bdf23bcebdab929884d6f1f2ed3e0f797831d2
+```
+- Show log of changes
+```
+git reflog --all --relative-date
+```
+##### Branches
+- List Branches
+```
+git branch
+```
+- Create And Checkout Branches
+```
+git checkout -b branchname
+```
+- Merge a bracnch to the current branch
+```
+git merge branchname
+```
+
+##### Remote Repositories
+- Add a remote repo.
+```
+git remote add origin https://github.com/lonynamer/mygitrepo.git
+```
+- Fetch a specific branch
+```
+git fetch origin branchname
+```
+- Pull remote repos current branch
+```
+git pull origin
+```
+- Push a branch
+```
+git push origin
+# Also fine if origin is set.
+git push 
+```
+- Push all branches
+```
+git push origin --all
+# Also fine if origin is set.
+git push --all
+```
+
+##### git config
+- Set author name current user
+```
+git config --global user.name "Lony Namer"
+```
+- Set author email for current user
+```
+git config --global user.email namer.lony@gmail.com
+```
+- Set text editor used for merges and conflicts etc for all users.
+```
+sudo git config --system core.editor vi
+```
+- Edit the system configuration file
+```
+sudo git config --system --edit
+```
+- Edit the global configuration file for user
+```
+git config --global --edit
+# OR
+vi ~/.gitconfig
+```
+
+
