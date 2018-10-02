@@ -290,6 +290,11 @@ git remote show origin
 ```
 git reset --hard f414f31
 ```
+##### REVERT BACK BY CREATING A NEW COMMIT END UNDOING CHANGES
+- Create a new commit that undoes the changes in a commit.
+```
+git revert 08bdf23bcebdab929884d6f1f2ed3e0f797831d2
+```
 
 ##### REVERT BACK BY CREATING A NEW COMMIT FROM AN OLD COMMIT 
 - This one also adviced by using a bracnh.
