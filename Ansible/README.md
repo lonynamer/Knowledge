@@ -973,7 +973,7 @@ $ cat loadbalancer.yml # File
     service: name=nginx state=started enabled=yes
 
   - name: configure nginx site
-    template: src=template/nginx.conf.j2 dest=/etc/nginx/sites-available/demo mode=0644
+    template: src=templates/nginx.conf.j2 dest=/etc/nginx/sites-available/demo mode=0644
     notify: restart nginx
 
   - name: disable default nginx site
@@ -1177,11 +1177,11 @@ $ cat roles/mysql/handlers/main.yml
     service name=mysql status=restarted
 ```
 
-***
 ### Converting to roles, files, templates
 #### NGINX
 ```
-$ cp template/nginx.conf.j2 roles/nginx/templates/
+$ mv templates/nginx.conf.j2 roles/nginx/templates/
+$ rm -rf templates
 ```
 ```
 $ cat roles/nginx/templates/nginx.conf.j2
@@ -1325,10 +1325,10 @@ name: restart apache2
      service: name=apache2 state=restarted
 ```
 
-### Site.yml include
+### site.yml include
 Include everything in one file. You can do incluse in tasks and handlers as well.
 ```
-$ cat roles/site.yml
+$ cat site.yml
 
 ---
 - include: control.yml
@@ -1338,7 +1338,7 @@ $ cat roles/site.yml
 ```
 
 ### Variable: facts (gather_facts)
-Gathering facts and variables.
+Gathering facts and variables.  
 This will print all the information related to server in json format.
 ```
 ansible -m setup db01
@@ -1347,19 +1347,18 @@ A section from roles/mysql/main.yml. Using variable from facts inside yaml to ch
 ```
 # Add to database.yml
 - hosts: webservers
-  gather_facts: false
+  gather_facts: true
 ```
 ```
 # Add to playbooks/stack_status.yml
 - hosts: webservers
-  gather_facts: false
+  gather_facts: true
 ```
 ```
 $ cat roles/mysql/tasks/main.yml
 
 - name: ensure mysql listening on all ports
-  lineinfile: dest=/etc/mysql/mysql.conf.d/mysqld.cnf regexp=^bind-address
-              line="bind-address = {{ ansible_eth0.ip4.address }}"
+  lineinfile: dest=/etc/mysql/mysql.conf.d/mysqld.cnf regexp=^bind-address line="bind-address = {{ ansible_eth0.ipv4.address }}"
 ```
 ```
 $ cat playbooks/stack_restart.yml
@@ -1370,7 +1369,7 @@ $ cat playbooks/stack_restart.yml
 
 ### Variables: defaults
 ```
-$ cat roles/mysql/tasks/main.yml # Add
+$ cat roles/mysql/tasks/main.yml # Edit/Add
 
 - name: create database
   mysql_db: name={{ db_name }} state=present
@@ -1383,7 +1382,7 @@ Variables are set in defaults folder under roles.
 ```
 $ cat roles/mysql/defaults/main.yml # File
 
-db_name: mypp
+db_name: myapp
 db_user_name: dbuser
 db_user_pass: dbpass
 db_user_host: local
@@ -1472,9 +1471,11 @@ sites:
 ```
 $ cat roles/nginx/templates/nginx.conf.j2
 
+# Jinja format loop upstream
 upstream {{ item.key }} {
-{% for server in groups.webserver %}
-    server {{ server }}:{{ item.value.backend }};
+{% for server in groups.webservers %}
+#  server {{ server }};
+  server {{ hostvars[server].ansible_host }};
 {% endfor %}
 }
 
@@ -1506,7 +1507,7 @@ sites:
 $ cat roles/nginx/tasks/main.yml
 
 - name: get active sites
-  shell: ls -1 /etc/nginx/sites-enabled
+  shell: ls -1 /etc/nginx/sites-enabled/
   register: active
 
 - name: de-activate sites
