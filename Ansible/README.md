@@ -1101,8 +1101,8 @@ Above created roles with ansible-galaxy commands by our selves.
 This will create initialized directories nginx, apache2, demo_app, mysql under our ansible directory.
 There is ansibe galaxy site which you can install pre-defined roles.
 You can register, create and push your own roles galaxy site.
-- https://galaxy.ansible.com/
-How To:
+- https://galaxy.ansible.com/  
+How To:  
 - https://docs.ansible.com/ansible/latest/reference_appendices/galaxy.html
 ---
 ```
