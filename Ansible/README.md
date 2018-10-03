@@ -1279,6 +1279,11 @@ $ cat roles/apache2/tasks/main.yml
 - name: ensure apache2 started
   service: name=apache2 state=started enabled=yes
 ```
+Move source files to files and templates to templates inder demo_app role.
+```
+mv demo roles/demo_app/files/
+mv demo/app/demo.wsgi roles/demo_app/templates/demo.wsgi.j2
+```
 ```
 $ cat roles/demo_app/tasks/main.yml
 
@@ -1292,6 +1297,11 @@ $ cat roles/demo_app/tasks/main.yml
 
 - name: copy demo app source  
   copy: src=demo/app/ dest=/var/www/demo mode=0755
+  notify: restart apache2
+
+# Add this task to create wsgi file from Jinja Template instead of copying.
+- name: copy demo.wsgi
+  template: src=demo.wsgi.j2 dest=/var/www/demo/demo.wsgi mode=0755
   notify: restart apache2
 
 - name: copy apache virtual host config  
@@ -1616,6 +1626,8 @@ Example: We have a python db connection jinja2 template
 - What we do is. We have variables. Calling the role by variables, so it's injecting  variables to the template while creating it.
 ---
 ```
+$ cat roles/demo_app/templates/demo.wsgi.j2
+
 activate_this = '/var/www/demo/.venv/bin/activate_this.py'
 execfile(activate_this, dict(__file__=activate_this))
 
