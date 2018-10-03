@@ -1088,7 +1088,6 @@ $ cat playbooks/stack_status.yml # File
 - First create a folder called roles initialize a role for each tier.
 ---
 ```
-ansible container init  # inits the main foldes to work with ansible.
 ansible-galaxy init control # inits roles under the container.
 ansible-galaxy init nginx
 ansible-galaxy init apache2
@@ -1099,6 +1098,7 @@ ansible-galaxy init mysql
 ### Ansible galaxy
 ---
 Above created roles with ansible-galaxy commands by our selves.
+This will create initialized directories nginx, apache2, demo_app, mysql under our ansible directory.
 There is ansibe galaxy site which you can install pre-defined roles.
 You can register, create and push your own roles galaxy site.
 - https://galaxy.ansible.com/
