@@ -444,7 +444,7 @@ $ cat webserver.yml # File
 
     - name ensure mod_wsgi enabled
       apache2_module: state=present name=wsgi
-      notify: restart apache2
+      notify: restart apache
 
   handlers:
   - name restart apache
@@ -531,7 +531,7 @@ $ cat webserver.yml # Add
 
     - name: copy demo app source
       copy: src=demo/app/ dest=/var/www/demo mode=0755
-      notify: restart apache2
+      notify: restart apache
 ```
 ```
 $ cat webserver.yml # Add
@@ -559,15 +559,15 @@ $ cat webserver.yml # File
 
     - name ensure mod_wsgi enabled
       apache2_module: state=present name=wsgi
-      notify: restart apache2
+      notify: restart apache
 
     - name: copy demo app source
       copy: src=demo/app/ dest=/var/www/demo mode=0755
-      notify: restart apache2
+      notify: restart apache
 
     - name: copy apache virtual host config
       copy: src=demo/demo.conf dest=/etc/apache2/site-available mode=0755    
-      notify: restart apache2
+      notify: restart apache
 
   handlers:
   - name restart apache
@@ -608,15 +608,15 @@ $ cat webserver.yml # File
 
     - name ensure mod_wsgi enabled
       apache2_module: state=present name=wsgi
-      notify: restart apache2
+      notify: restart apache
 
     - name: copy demo app source
       copy: src=demo/app dest=/var/www/demo mode=0755
-      notify: restart apache2
+      notify: restart apache
 
     - name: copy apache virtual host config
       copy: src=demo/demo.conf dest=/etc/apache2/site-available mode=0755    
-      notify: restart apache2
+      notify: restart apache
 
     - name: setup python virtualenv
       pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo/.venv
@@ -664,15 +664,16 @@ $ cat webserver.yml # File
 
     - name ensure mod_wsgi enabled
       apache2_module: state=present name=wsgi
-      notify: restart apache2
+      notify: restart apache
 
     - name: copy demo app source
       copy: src=demo/app/ dest=/var/www/demo mode=0755
-      notify: restart apache2
+      notify: restart apache
+      
 
     - name: copy apache virtual host config
       copy: src=demo/demo.conf dest=/etc/apache2/site-available mode=0755    
-      notify: restart apache2
+      notify: restart apache
 
     - name: setup python virtualenv
       pip:       requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo/.venv
@@ -1270,11 +1271,11 @@ $ cat roles/apache2/tasks/main.yml
 
 - name: ensure mod_wsgi enabled
   apache2_module: state=present name=wsgi
-  notify: restart apache2
+  notify: restart apache
 
 - name: de-activate default apache site
   file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
-  notify: restart apache2
+  notify: restart apache
 
 - name: ensure apache2 started
   service: name=apache2 state=started enabled=yes
@@ -1297,25 +1298,24 @@ $ cat roles/demo_app/tasks/main.yml
 
 - name: copy demo app source  
   copy: src=demo/app/ dest=/var/www/demo mode=0755
-  notify: restart apache2
+  notify: restart apache
 
 # Add this task to create wsgi file from Jinja Template instead of copying.
 - name: copy demo.wsgi
   template: src=demo.wsgi.j2 dest=/var/www/demo/demo.wsgi mode=0755
-  notify: restart apache2
+  notify: restart apache
 
 - name: copy apache virtual host config  
   copy: src=demo/demo.conf dest=/etc/apache2/sites-available mode=0755
-  notify: restart apache2
+  notify: restart apache
 
 - name: setup python virtualenv
   pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo/.venv
-        notify: restart apache2
+        notify: restart apache
 
 - name: activate demo apache site
   file: src=/etc/apache2/sites-available/demo.conf dest=/etc/apache2/sites-enabled/demo.conf state=link
-  notify: restart apache2
-  notify: restart apache2
+  notify: restart apache
 ```
 
 ### NOTES: From this point no configuration will not be printed fully. All are just sample blocks.
@@ -1324,14 +1324,14 @@ $ cat roles/demo_app/tasks/main.yml
 $ cat roles/demo_app/handlers/main.yml
 
 ---
-name: restart apache2
+name: restart apache
      service: name=apache2 state=restarted
 ```
 ```
 $ cat roles/apache2/handlers/main.yml
 
 ---
-name: restart apache2
+name: restart apache
      service: name=apache2 state=restarted
 ```
 
@@ -1670,8 +1670,16 @@ $ ansible-vault create vault
 # vault in the end is the file name we create, it will ask password.
 # vi editor will open
 ---
-vault_db_pass: MyPassword123
-``` 
+vault_db_pass: demo
+```
+```
+$ cat group_vars/all/vars
+
+---
+db_name: demo
+db_user: demo
+db_pass: "{{ vault_db_pass }}"
+```
 To edit password. You need to remember the password which you gave to the file.
 ```
 ansible-vault edit vault
