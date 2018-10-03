@@ -1426,6 +1426,99 @@ include params
 extra vars (always win precedence)
 ```
 
+### Variables; vars_files, group_vars
+---
+Those are the locations where all playbooks and playbooks uses without adding to ansible.cfg. Default locations. Good way to hold varibles in a central location.
+- https://docs.ansible.com/ansible/intro_inventory.html#splitting-out-host-and-group-specific-data
+- https://docs.ansible.com/ansible/playbooks_variables.html#variable-file-separation
+---
+
+Create directories
+```
+mkdir vars_files
+mkdir group_var
+touch group_var/all
+```
+Set variables
+```
+$ cat group_vars/all
+
+---
+db_name: demo
+db_user: demo
+db_pass: demo
+```
+Inject variables to roles
+```
+$ cat databases.yml
+---
+- hosts: database
+  become: true
+  roles:
+    - role: mysql
+      db_user_name: "{{ db_user }}"
+      db_user_pass: "{{ db_pass }}"
+      db_user_host: '%'
+```
+Use variables inside tasks code. This is called variable routing.
+```
+$ cat roles/mysql/tasks/main.yml
+
+- name: create database
+  mysql_db: name={{ db_name }} state=present
+
+- name: create user
+  mysql_user: name={{ db_user_name }} password={{ db_user_pass }} priv={{ db_name }}.*:ALL
+              host='{{ db_user_host }}' state=present
+```
+
+
+### Variables; vars_files, group_vars
+---
+Those are the locations where all playbooks and playbooks uses without adding to ansible.cfg. Default locations. Good way to hold varibles in a central location.
+- https://docs.ansible.com/ansible/intro_inventory.html#splitting-out-host-and-group-specific-data
+- https://docs.ansible.com/ansible/playbooks_variables.html#variable-file-separation
+---
+
+Create directories
+```
+mkdir vars_files
+mkdir group_var
+touch group_var/all
+```
+Set variables
+```
+$ cat group_vars/all
+
+---
+db_name: demo
+db_user: demo
+db_pass: demo
+```
+Inject variables to roles
+```
+$ cat databases.yml
+---
+- hosts: database
+  become: true
+  roles:
+    - role: mysql
+      db_user_name: "{{ db_user }}"
+      db_user_pass: "{{ db_pass }}"
+      db_user_host: '%'
+```
+Use variables inside tasks code. This is called variable routing.
+```
+$ cat roles/mysql/tasks/main.yml
+
+- name: create database
+  mysql_db: name={{ db_name }} state=present
+
+- name: create user
+  mysql_user: name={{ db_user_name }} password={{ db_user_pass }} priv={{ db_name }}.*:ALL
+              host='{{ db_user_host }}' state=present
+```
+
 Overriding/injecting variables when calling a role
 ```
 $ cat database.yml 
@@ -1543,52 +1636,6 @@ $ cat webserver.yml
   roles:
     - apache2
     - { role: demo_app, db_user: demo, db_pass: demo, db_name: demo }
-```
-
-### Variables; vars_files, group_vars
----
-Those are the locations where all playbooks and playbooks uses without adding to ansible.cfg. Default locations. Good way to hold varibles in a central location.
-- https://docs.ansible.com/ansible/intro_inventory.html#splitting-out-host-and-group-specific-data
-- https://docs.ansible.com/ansible/playbooks_variables.html#variable-file-separation
----
-
-Create directories
-```
-mkdir vars_files
-mkdir group_var
-touch group_var/all
-```
-Set variables
-```
-$ cat group_vars/all
-
----
-db_name: demo
-db_user: demo
-db_pass: demo
-```
-Inject variables to roles
-```
-$ cat databases.yml
----
-- hosts: database
-  become: true
-  roles:
-    - role: mysql
-      db_user_name: "{{ db_user }}"
-      db_user_pass: "{{ db_pass }}"
-      db_user_host: '%'
-```
-Use variables inside tasks code. This is called variable routing.
-```
-$ cat roles/mysql/tasks/main.yml
-
-- name: create database
-  mysql_db: name={{ db_name }} state=present
-
-- name: create user
-  mysql_user: name={{ db_user_name }} password={{ db_user_pass }} priv={{ db_name }}.*:ALL
-              host='{{ db_user_host }}' state=present
 ```
 
 ### Variables: vault
