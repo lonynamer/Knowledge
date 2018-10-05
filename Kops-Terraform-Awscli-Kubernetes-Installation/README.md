@@ -241,6 +241,7 @@ export KOPS_STATE_STORE=s3://kops-lony
 - Kops command below will now create the cluster.  
 - It will create `etcd` state store on aws `s3`. 
 - Additionally a `terraform` directory named `kops_cluster_create_terraform` which will be our `IaC` source to install cluster.
+- Additionally, if you delete the cluster, need to keep backup of `etcd` s3://kops-lony and keep with `terraform` file.
 ```
 kops create cluster \
  --name=cluster.k8s.local \
@@ -267,16 +268,11 @@ terraform init
 terraform apply
 ```
 ###### Validate  
-- Wait a little bit, find the IP of one of the masters, ssh with private key and user admin `admin` if you use the default OS image.  
-```
-kubectl get cluster-info
-kubectl get pods --all-namespace
-kubectl get service --all-namespace
-kubectl get deployments --all-namespace
-```
+- Couldn't validate there is a DNS issue, need to convert hostname of `api` to FDQN for `kubectl` or `kops` as they cannot reach hostname becuase we didn't use our own domain name. Need to figure out the FDQN of `api` and set as default.
+
 
 ###### DELETE THE CLUSTER BY TERRAFORM
-- Inside the `cd kops_cluster_create_terraform` directory.  
+- Inside the `kops_cluster_create_terraform` directory.  
 ```
 terraform destroy
 ```
