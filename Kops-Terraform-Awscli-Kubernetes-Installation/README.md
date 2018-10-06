@@ -230,7 +230,30 @@ tomcat       LoadBalancer   100.66.108.111   a09693a68c87c11e8b935060e708c3e8-20
 export KOPS_STATE_STORE=s3://kops-lony
 kops delete cluster cluster.k8s.local
 ```
+###### STOPPING THE CLUSTER
+- `Kubernetes Cluster` created by `Kops`, is not designed to be stopped. Even you stop or terminate the instances, new ones will be created according to `Desired State` configured at `Launch Configurations` and `Auto Scaling Gropus` in `AWS` created by `Kops`.  
+- So, We will do a trick and change the `Instance Groups` configurations of desired min and max number of nodes and masters.
+```
+kops get ig
+```
+Output:
+```
+Using cluster from kubectl context: cluster.k8s.local
 
+NAME                    ROLE    MACHINETYPE     MIN     MAX     ZONES
+master-eu-central-1b    Master  t2.medium       0       0       eu-central-1b
+nodes                   Node    t2.medium       0       0       eu-central-1b
+```
+```
+kops edit ig master-eu-central-1b
+kops edit ig nodes
+```
+- Edit `vi` style and change `maxSize:` and `maxSize:` values to 0 and `:wq!` .  
+- Update the configuration change. Instances will terminate.
+- You will not use data, when you reverts back the settings the same way, cluster will come back.
+```
+kops update cluster cluster.k8s.local --yes
+```
 
 ##### CLUSTER CREATION BY TERRAFORM AND KOPS
 - Variable that sets etcd state store database. 
