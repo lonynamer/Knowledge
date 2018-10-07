@@ -14,23 +14,33 @@
 - We use `API objects` by `CLI` to describe desired state of our cluster like application workloads to run, container image, replicas, network, disk resources.  
 - Once we set our desired state, `Kubernetes Control Plane` matches/converts the current state to our desired state.  
 
-##### Kubernetes Master, Kubernetes Nodes(Minions, Non Masters)  
+##### Kubernetes Master, Kubernetes Nodes(Minions, Non Masters) And Their Jobs
 - In a simple installation, it consists of `Master Node` and `Nodes`.  
 - You can install this nodes on `bare-metal`, `aws` instances, `vms` etc.
 ###### Master Components
-    - `etcd` : key=value storage for all cluster data.
-    - `kube-apiserver` : 
-    - `kube-control-manager` :
-    - `kube-scheduler` :
+    - `etcd` : highly available key=value storage for all cluster data.  
+    - `kube-apiserver` : Frontend of k8s, validates and configures data for api objects.  
+                         Horizontaly scalable by adding more instances.  
+    
+    - `kube-scheduler` : Take the pods that aren't bound to a node by `hardware/software/policy constrains.`  
+    - `kube-control-manager` : 
+       - `Node Controller` : Noticing and responding when nodes go down.   
+       - `Replication Controller`: Maintaining correct number of pods for every object in the system.  
+       - `Endpoint Controller` : Joins `Services` and `Pods`.  
+       - Service account & Token Controllers: Create default accounts and API access tokes for new namespaces.  
+     - `cloud-control-manager` : Following controllers have `cloud provider` dependencies and interacts with underlying cloud provider.  
+       - `Node Controller` : Check if node is deleted after it stops responding.  
+       - `Route Controller` : Setting up routes in the underlying cloud infra.  
+       - `Service Controller` : Creating, updating, deleting cloud provider load balancers.  
+       - `Volume Controller` : Creating, attaching, mounting volumes and interacting with cloud provider to orchestrate volumes.  
 ###### Nodes(Minions)
-    - `kubelet` :
-    - `kube-proxy` :
+    - `kubelet` : communicater with K8s Master.  
+    - `kube-proxy` : A network proxy which reflects networking services on each node.
+    
 ### Kubernetes General Documentation & References
 ---
 - Kubernetes Docs
 https://kubernetes.io/docs/
-- Kubernetes Course File
-https://github.com/jleetutorial/kuburnetes-demo
 ---
 ### CHEAT SHEAT REFERENCE
 ---
