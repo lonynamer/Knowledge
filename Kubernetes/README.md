@@ -18,6 +18,7 @@
 - In a simple installation, it consists of `Master Node` and `Nodes`.  
 - You can install this nodes on `bare-metal`, `aws` instances, `vms` etc.
 ###### Master Components
+---
     - `etcd` : highly available key=value storage for all cluster data.  
     - `kube-apiserver` : Frontend of k8s, validates and configures data for api objects.  
                          Horizontaly scalable by adding more instances.  
@@ -33,10 +34,14 @@
        - `Route Controller` : Setting up routes in the underlying cloud infra.  
        - `Service Controller` : Creating, updating, deleting cloud provider load balancers.  
        - `Volume Controller` : Creating, attaching, mounting volumes and interacting with cloud provider to orchestrate volumes.  
+---
+
 ###### Nodes(Minions)
+---
     - `kubelet` : communicater with K8s Master.  
     - `kube-proxy` : A network proxy which reflects networking services on each node.
-    
+---
+
 ### Kubernetes General Documentation & References
 ---
 - Kubernetes Docs
