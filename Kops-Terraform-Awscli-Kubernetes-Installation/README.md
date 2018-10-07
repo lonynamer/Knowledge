@@ -18,6 +18,7 @@
 AmazonEC2FullAccess
 AmazonRoute53FullAccess
 AmazonS3FullAccess
+IAMFullAccess
 AmazonVPCFullAccess
 ```
 - The second way is creating user with the same IMA Roles and using. You can do this step after awscli installation.
