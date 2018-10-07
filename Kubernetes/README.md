@@ -1,5 +1,30 @@
 ## Kubernetes Knowledge
-Kubernetes is an open-source, self-healing, auto-scaling container orchestration solution. 
+
+### What is Kubernetes(k8s) ?  
+- Kubernetes is an open-source, self-healing, auto-scaling containerized workloads and micro-services orchestration solution. 
+- It's portable, extensible with large, rapidly growing ecosystem. Services, support and tools are widely awailable.  
+- It orchestrates computing, networking, storage environment and this provides simplicity of IaaS with the fexibiliy of PaaS.  
+- Enables portability accross infrastructure providers.  
+- Kubernetes operates at container level and not a complete/traditional Paas system. 
+- It provides some generally applicable features common to `Paas, such as `deployment`, `scaling`, `load balancing`, `logging`, and `monitoring`.  
+- Kubernetes facilitates by both `Declerative Configuration`, `Imperative Configuration` and `Automation`.  
+- It has many installers and solutions for `bare-metal`, `gcp`, `aws`, `azzure` and many cloud providers.
+
+### Kubernetes Concepts
+- We use `API objects` by `CLI` to describe desired state of our cluster like application workloads to run, container image, replicas, network, disk resources.  
+- Once we set our desired state, `Kubernetes Control Plane` matches/converts the current state to our desired state.  
+
+##### Kubernetes Master, Kubernetes Nodes(Minions, Non Masters)  
+- In a simple installation, it consists of `Master Node` and `Nodes`.  
+- You can install this nodes on `bare-metal`, `aws` instances, `vms` etc.
+###### Master Components
+    - `etcd` : key=value storage for all cluster data.
+    - `kube-apiserver` : 
+    - `kube-control-manager` :
+    - `kube-scheduler` :
+###### Nodes(Minions)
+    - `kubelet` :
+    - `kube-proxy` :
 ### Kubernetes General Documentation & References
 ---
 - Kubernetes Docs
