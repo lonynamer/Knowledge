@@ -82,7 +82,8 @@ REST >>> etcd on Masters
 - Volumes are attached to pod and orchastrated by `Kubernetes`  
 - awsEBS, azzureDisk, azzureFile, cephfs, configMap, csi, downwardAPI, emptyDir, FC(fiber), flocker, gcePersistentDisk, gitRepo(deprecated), glusterfs,hostPath, iscsi, local, nfs, persistentVolumeClaim, projected, portworxVolume, quobyte, rbd, scaleIO, secret, storageos, vsphereVolume are solutions supported.
 ###### Namespace
-- Namespaces may be used for isolation of resourcess across users and teams, unique resource allocation.  
+- Namespaces may be used for isolation of resourcess across users and teams, unique resource allocation. 
+- It can be used together with `ResourceQuotas` to create a pool of resources.
 - You can put pods to desired namespaces.  
 - In some cases, it is used for security, communication limitations.  
 - It's like virtual clustering of deployments.
@@ -149,6 +150,8 @@ REST >>> etcd on Masters
 - Describes the volume to attach to the Pod/Pods
 
 ###### LABELS AND SELECTORS
+
+###### RESOURCE QUOTAS WITH NAME SPACES
 
 ###### READINESS PROBE
 
@@ -412,6 +415,11 @@ spec:
 ---
 https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
 ---
+kubectl proxy
+kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+
+# fix for dashboard
+http://localhost:8001/api/v1/namespaces/kube-system/services/kubernetes-dashboard/proxy
 ```
 kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
 ```
