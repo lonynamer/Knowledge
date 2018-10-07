@@ -2,12 +2,13 @@
 
 ### What is Kubernetes(k8s) ?  
 - Kubernetes is an open-source, self-healing, auto-scaling containerized workloads and micro-services orchestration solution. 
+- It's mainly use for orchestrat `docker` and `rkt` containers.  
 - It's portable, extensible with large, rapidly growing ecosystem. Services, support and tools are widely awailable.  
 - It orchestrates computing, networking, storage environment and this provides simplicity of IaaS with the fexibiliy of PaaS.  
 - Enables portability accross infrastructure providers.  
 - Kubernetes operates at container level and not a complete/traditional Paas system. 
-- It provides some generally applicable features common to `Paas, such as `deployment`, `scaling`, `load balancing`, `logging`, and `monitoring`.  
-- Kubernetes facilitates by both `Declerative Configuration`, `Imperative Configuration` and `Automation`.  
+- It provides some generally applicable features common to `Paas`, such as `deployment`, `scaling`, `load balancing`, `logging`, and `monitoring`.  
+- Kubernetes facilitates by both `Declerative Configuration`, `Imperative Configuration` and `Automation`. 
 - It has many installers and solutions for `bare-metal`, `gcp`, `aws`, `azzure` and many cloud providers.
 
 ### Kubernetes Concepts and Components
@@ -52,7 +53,73 @@ REST >>> etcd on Masters
 ```
 
 ### Objects
-- Kubernetes has abstractions represents the state of your deployed containerized applications and workloads.
+- Kubernetes has `abstractions` that represents the state of your deployed containerized applications and workloads, their network, volumes and other resources.
+
+###### Pod
+- Pod describes the smallest unit, represents a running proccess in a container.  
+- Pod covers/holds a container. It can hold more than one containers.  
+- A pod in general is only for one process/container but you can add   
+  additional containers example for monitoring, logging purposes.  
+- `Pods` are `ephemeral` when crashes/stops, a static desired/described clean image will be brought up. Files created during runtime will be lost. `volumes` solves this problem.
+
+###### Service
+- Service describes the connectivity of the `Pod`.
+- Service covers the pod. 
+- Types:  
+  - ClusterIP: Exposes a deployment internally as a cluster to other deployments by `egress` loadbalancer.  
+  - NodePort: Exposes a deployment
+  - LoadBalancer: 
+  - ExternalName: 
+###### Volume
+- `Pods` are ephemeral and need to share files between `containers`
+- Volumes are attached to pod and orchastrated by `Kubernetes`  
+- awsEBS, azzureDisk, azzureFile, cephfs, configMap, csi, downwardAPI, emptyDir, FC(fiber), flocker, gcePersistentDisk, gitRepo(deprecated), glusterfs,hostPath, iscsi, local, nfs, persistentVolumeClaim, projected, portworxVolume, quobyte, rbd, scaleIO, secret, storageos, vsphereVolume are solutions supported.
+###### Namespace
+- Namespaces may be used for isolation of resourcess across users and teams, unique resource allocation.  
+- You can put pods to desired namespaces.  
+- In some cases, it is used for security, communication limitations.  
+- It's like virtual clustering of deployments.  
+
+- High level abstractions called Controllers:
+###### ReplicaSet
+- Describes number of minimum, maximum numbers of Pods of a deployment.
+
+###### Deployment
+- Deployment covers the pods, replicasets and describes a complete deployment.
+- Describes pods, containers, containerport, replicas, attached volume, everything related aorund.
+
+###### StatefulSet
+
+###### DaemonSet
+
+###### Job
+
+- Mode objects
+###### Replication Controller
+
+###### PersistentVolumeClaim
+
+###### PersistentVolume
+
+###### StorageClass
+
+
+
+
+```
+kubectl --version
+kubectl cluster-info
+kubectl get nodes
+kubectl get pods
+kubectl logs pod `podname`
+kubectl describe pod `podname`
+kubectl delete pod `podname`
+$ kubectl --namespace=<insert-namespace-name-here> run nginx --image=nginx
+$ kubectl --namespace=<insert-namespace-name-here> get pods
+$ kubectl config set-context $(kubectl config current-context) --namespace=<insert-namespace-name-here>
+# Validate it
+$ kubectl config view | grep namespace:
+```
 
 ### Kubernetes General Documentation & References
 ---
