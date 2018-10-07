@@ -437,6 +437,7 @@ Used for decoupling but working together together as independent modules
 
 -----------------
 # Volume Configuration Separate
+```
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -468,8 +469,6 @@ spec:
     requests:
       storage: 20Gi
 -------------------
-```
-```
 # deployment configuration
 
 template:
