@@ -622,8 +622,9 @@ volumes:
 
 
 ### Auto Scaling
-- HPA - Horizontal Pod Autoscaler will create or remove pods according to maintain avarage CPU utilization accross the pods.
-- Example % 50 CPU utilization per pod avarage of % 50 per Pod.
+- HPA - Horizontal Pod Autoscaler will create or remove pods according to maintain avarage CPU utilization accross the pods.  
+- https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/  
+- Example % 50 CPU utilization per pod avarage of % 50 per Pod.  
 ```
 $ kubectl autoscake deployment wordpress --cpu-percent=50 --min=1 --max=10
 ```
