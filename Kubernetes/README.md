@@ -58,6 +58,13 @@ REST >>> etcd on Masters
 - Stateful: Pods or containers are stateless.  
 - Statefull: When you attach volume, it can be stateful.  
 
+### DNS & SERVICE DISCOVERY
+- Used for decoupling but working together together as independent modules. Kubernetes has a build in DNS.  
+- Kubernetes configures kubelets to solve DNS Names of each other as;  
+```
+<my-srv-name>.<my-name-space>.svc.cluster.local
+```
+
 ### Objects
 - Kubernetes has `abstractions` that represents the state of your deployed containerized applications and workloads, their network, volumes and other resources.
 
@@ -162,6 +169,12 @@ REST >>> etcd on Masters
 ###### HORIZONTAL POD AUTOSCALER (hpa)
 
 - Some Other Stuff
+###### CONTAINER HEALTH CHECK
+- Health Checks can be described.  
+- Types :  
+  - READINESS PROBE(If it came up)  
+  - LIVENESS PROBE(If it's working)  
+
 ###### Auditing.
 - https://kubernetes.io/docs/tasks/debug-application-cluster/audit/  
 - Auditing means recording who does what, when and why provides security-relevant chronological set of records.  
@@ -262,19 +275,31 @@ https://github.com/kubernetes/code-generator
 ### ADDONS
    https://github.com/kubernetes/kops/blob/master/docs/addons.md.
 
-### TECHNICAL, COMMANDS AND YAML DESCRIPTION FOR IaC
-Some Important Commands To Know After Kubectl
-- `get` shows 
-- `describe` describes in json format  
-- `expose` publishes outside.  
-- `exec` runs a command in a pod, like you can run bash/sh and connect to console. -it (interactive and tty)  
-- `attach` attachs a container like, you have a backgrounded bash, attach is used to attach.  
-- `label` assings key:value pairs, some key value pairs like app, tier are used to attach services/components together.  
-   Like Deployment, Service, Pod, Container, Storage. As labels and selectors.  
-- `run` runs.  
-- `create` creates.  
+###### Kubernetes DashBoard Installation  
+- https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/  
+Installation:  
+```
+kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+```
+# fix for dashboard
+http://localhost:8001/api/v1/namespaces/kube-system/services/kubernetes-dashboard/proxy  
+```
+kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+```
+Accessing:
+```
+# Run kubectl proxy on master
+kubectl proxy
+```
+Browse To:
+```
+https://<master-ip>:<apiserver-port>/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy
+```
 
+### TECHNICAL, COMMANDS AND YAML DESCRIPTION FOR IaC
+ 
 ###### SOME COMMANDS
+`get`, `describe`, `logs`, `edit`, `create`,  `run`, `exec`, `attach`,`delete`, `expose`, `label`, `config`, `set`, `port-forward` are some common commands used after `kubectl` command on `OBJECTS`.  
 ```
 kubectl --version
 kubectl cluster-info
@@ -357,15 +382,22 @@ kubectl roleout history deployment/tomcat-deployment
 
 ##Get rollout history after update
 kubectl rollout history deployment/tomcat-deployment --revision=2
+
+## Namespace Commands
+# Get NameSpaces
+kubectl get namespace
+# Get ResourceQuotas
+kubectl get resourcequota --namespace=kube-system
+# Create deployment on a Namespace 
+kubectl get deployment --namespace=tomcat-namespace
 ```
 
 ###### DEPLOYMENT/DESCRIPTION BY YAML FILE
 - Pods, Services, Deployments, Networks, Storages, Kubernetes Addons, Namespace etc., all can be described, installed and changed by yaml file like this.  
+- Yaml File Example:
+Config: tomcat-deployment.yml
 ```
-kubectl apply -f ./deployment.yaml
-```
-###Yaml File Example
-```
+# DEPLOYMENT (WHOLE FILE)
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -374,9 +406,11 @@ spec:
   selector:
     matchLabels:
       app: tomcat
-  replicas: 1
+  # SCALING AND REPLICATION
+  replicas: 4
   template:
     metadata:
+      # LABEL
       labels:
         app: tomcat
     spec:
@@ -385,17 +419,7 @@ spec:
         image: tomcat:9.0
         ports:
         - containerPort: 8080
-```
-
-### HEALT CHECK
-- READINESS(If it came up)
-- LIVENESS(If it's working) 
-#### spec: > template: > spec: > container:
-```
-spec:
-  template:
-    spec:
-      container:
+#HEALTH CHECK
         livenessProbe:
           httpGet:
             path: /
@@ -406,35 +430,103 @@ spec:
           httpGet:
             path: /
             port: 8080
-          initialDelaySeconds: 30  # Period to fail
-          periodSeconds: 30         # Period
+          initialDelaySeconds: 15
+          periodSeconds: 3
+          # SELECTOR
+          nodeSelector:
+            storageType: ssd
 ```
-### KUBE WEB UI > Runs on Master
-#### You can do the things in KUBE WEB UI as well
-#### Documentation
----
-https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
----
-kubectl proxy
-kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
-
-# fix for dashboard
-http://localhost:8001/api/v1/namespaces/kube-system/services/kubernetes-dashboard/proxy
+Apply Deployment (to default namespace):
 ```
-kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+kubectl apply -f ./tomcat-deployment.yaml
 ```
-#### ACCESSING WEB UI
----
-https://<master-ip>:<apiserver-port>/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy
----
 
-You can also install using deployment and service yaml or helm package manager.
+###### NAMESPACE BY YAML
+Conf:  tomcat-namespace.yml
+```
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tomcat-namespace
+```
+Command To Apply:
+```
+kubectl apply -f tomcat.yml
+```
 
-### DNS & SERVICE DISCOVERY
-Used for decoupling but working together together as independent modules
-#### BUILD IN DNS
-#### Kubernetes configures kubelets to provide DNS IP to containers to solve DNS Names of each other.
-`<my-srv-name>.<my-name-space>.svc.cluster.local`
+###### RESOURCE QUOTA FOR A NAME SPACE
+- Kubernetes will not let to deploy or will apply the minimum available if you limit workspace with less quota than resource requested by deployment.  
+- In trouble shouting, it's important if 3 replicas cannot be created by limits, how many replicaes will create.  
+- https://kubernetes.io/docs/concepts/policy/resource-quotas/  
+
+Conf: tomcat-rq.yml
+```
+apiVersion: v1
+metada:
+  name: compute-resources
+spec:
+  hard:
+    pods: "4"
+    requests.cpu: "1"    # max to request per name space
+    requests.memory: "1Gi" # max to request per name space
+    requests.nvidia.com/gpu: 4 
+    limits.cpu: "2"  # cannot exceed somehow per namespace
+    limits.memory: 2Gi  # cannot exceed somehow per namespace
+    limits.nvidia.com/gpu: 4 
+    # More Quotas
+    #limit.cpu: "400m"  # 400 %
+    #configmaps: "10"
+    #persistentvolumeclaims: "4"
+    #replicationcontrollers: "20"
+    #secrets: "10"
+    #services: "10"
+    #services.loadbalancers: "2"
+```
+Command To Apply: 
+```
+kubeapply -f tomcat-rq.yml --namespace=tomcat-namespace
+```
+Commands To Validate:
+```
+kubectl create namespace test_namespace
+kubectl get namespace
+kubectl get quota --namespace=myspace
+```
+Create A Deployment In a Namespace
+```
+kubectl apply -f ./tomcat-deployment.yaml --namespace=tomcat-namespace
+```
+
+###### SERVICE
+Config: tomcat-service.yml
+```
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+  labels:
+    app: tomcat
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: wordpress
+    tier: frontend
+  type: LoadBalancer
+```
+Create The Service:
+```
+kubectl apply -f ./tomcat-deployment.yaml --namespace=tomcat-namespace
+```
+
+
+
+
+
+
+
 
 
 
@@ -519,65 +611,14 @@ volumes:
 ```
 
 
-### Namespace & Resource Quotas
-Name object of any type is possible for teams not to fight so namespaces are used.
-Default is fine but example you can create namespace per team, groups under organisations, staging, production.
- You can limit Compute, Storage, Memory, Number of Objects on NameSpace by ResourceQuotas
-```
-apiVersion: v1
-metada:
-  name: compute-resources
-spec:
-  hard:
-    pods: "4"
-    requests.cpu: "1"    # max to request per name space
-    requests.memory: "1Gi" # max to request per name space
-    limits.cpu: "2"  # cannot exceed somehow per name 
-    limits.memory: 2Gi  # cannot exceed somehow
-```
-```
-$ kubectl create namespace test_namespace
-$ kubectl get namespace
-```
-#### Create a NameSpace
-```
-kubectl create namespace cpu-limited-tomcat
-```
-```
-vi cpu-limited-tomcat
-```
-```
-#
-apiVersion: v1
-kind: ResourceQuota
-metadata:
-  name: compute-resources
-spec:
-  hard:
-    limit.cpu: "400m"  # 400 %
 
-# Apply ResourceQuota to Namespace
-# kubectl apply -f ./tomcat-deployment --namespace=cpu-limited-tomcat
 
-# Get NameSpaces
-$ kubectl get namespace
 
-# Get ResourceQuotas
-$ kubectl get resourcequota --namespace=kube-system
 
-# Create deployment on Namespace --namespace=
-$
-kubectl apply -f ./tomcat-deployment.yaml --namespace=cpu-limited-tomcat
 
-# Describe deployment
-kubectl describe deployment tomcat-deployment
-spec.template.spec.containers:
-  resources:
-    requests:
-      cpu: "200m"
-```
-- Kubernetes will not let to deploy or will apply the minimum available if you limit workspace with less quota than resource requested by deployment.
-- In trouble shouting, it's important if 3 replicas cannot be created by limits, how many replicaes will create.
+
+
+
 
 
 ### Auto Scaling
