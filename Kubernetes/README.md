@@ -3,6 +3,7 @@
 ### What is Kubernetes(k8s) ?  
 - Kubernetes is an open-source, self-healing, auto-scaling containerized workloads and micro-services orchestration solution. 
 - It's mainly use for orchestrat `docker` and `rkt` containers.  
+- Vertically, horrizontaly, infra-horrizontaly scalability.
 - It's portable, extensible with large, rapidly growing ecosystem. Services, support and tools are widely awailable.  
 - It orchestrates computing, networking, storage environment and this provides simplicity of IaaS with the fexibiliy of PaaS.  
 - Enables portability accross infrastructure providers.  
@@ -67,9 +68,10 @@ REST >>> etcd on Masters
 - Service covers the pod. 
 - Types:  
   - ClusterIP: Exposes a deployment internally as a cluster to other deployments by `egress` loadbalancer.  
-  - NodePort: Exposes a deployment
-  - LoadBalancer: 
-  - ExternalName: 
+  - NodePort: Exposes a deployment to a port between 30000-32767 on each node. Example apache runs on 80 on container and exposed as 32323 on each node. You can access the service out of the cluster from each node.  
+  - LoadBalancer: Exposes a deployment by an external load balancer of a cloud provider.  
+  - ExternalName: Maps the service to a `CNAME`.  
+  
 ###### Volume
 - `Pods` are ephemeral and need to share files between `containers`
 - Volumes are attached to pod and orchastrated by `Kubernetes`  
@@ -85,16 +87,37 @@ REST >>> etcd on Masters
 - Describes number of minimum, maximum numbers of Pods of a deployment.
 
 ###### Deployment
-- Deployment covers the pods, replicasets and describes a complete deployment.
-- Describes pods, containers, containerport, replicas, attached volume, everything related aorund.
+- Deployment covers the pods, replicasets and describes a complete deployment.  
+- Describes pods, containers, containerport, replicas, attached volume, everything related aorund.  
+- Provides declarative updates for Pods, ReplicaSets.  
 
 ###### StatefulSet
+- Is like a deployment but provides sticky idendity of pods and containers, they are not interchanable accross any rescheduling.  
+- This is required for deployments like `mongodb` cluster, `mysql` cluster where interoperability occurs between pods.  
+- StatefullSets are required one or more of the followings.  
+  - Stable, unique network identifiers.  
+  - Stable, persistent storage.  
+  - Ordered, graceful deployment and scaling.  
+  - Ordered, graceful deletion and termination.  
+  - Ordered, automated rolling updates.  
+  - Deployment and Scaling Guarantees.  
+     - Pods are created in a form of sequentially numbers and terminated reverse order.  
+     - Before a scaling operation is running all of it's precedecessors must be running and be ready.  
+     - Before a pod is terminated, all of it's successors must be completely shutdown.  
 
 ###### DaemonSet
+- Ensures all (or some) nodes run a copy of a Pod. As new nodes are added and removed from the cluster.  
+- Exammples: glusterd, ceph storage daemon on each node. `fluentd`, logstash log collection daemons. `Prometheus Node Exporter`, `collectd`, `Datadog` agent, New Relic agent, Ganglia `gmond` .  
 
 ###### Job
+- Describes a specified number of jobs runs on specified numbers of pods. When specified number of jobs finishes on a specified number of pods, ensures that pods are terminated.  
 
 - Mode objects
+
+###### ConfigMap Volume
+
+###### Secret Volume
+
 ###### Replication Controller
 
 ###### PersistentVolumeClaim
@@ -111,6 +134,12 @@ kubectl --version
 kubectl cluster-info
 kubectl get nodes
 kubectl get pods
+kubectl get services
+kubectl get rs
+kubectl describe rs
+kubectl describe services
+kubectl get deployments
+kubectl describe deployments
 kubectl logs pod `podname`
 kubectl describe pod `podname`
 kubectl delete pod `podname`
