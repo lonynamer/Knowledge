@@ -136,9 +136,18 @@ REST >>> etcd on Masters
 - A way to inject configuration data into pods.
 - Stores alias mapping for the parameters to keep the conteineried applications portable.
 
-###### Secret Volume
+###### Secret Volume and Secrets
 - Is used to pass sensitive information such application passwords to Pods. You can store secrets in Kubernetes API and mount them as files to use by Pods without coupling.
 - tmpfs RAM backed filesystem and newer written to a non-volatile storage. 
+- To keep human readable data like password, keys to keep to use inside configuration files. Instead of human reabable, It will be a non-human readable hash. It's not encryption, it's Base64 coding and not secure as encryption. It's just `encoding` by a known algoritm. Who ever have access to `Secrets` or have access to podds can `decode` the values and this secrets passes to pods by a volume type called `secret` volume, it only provides a way secure to pass secret data to pods. For more security `encryption` methods should be used. So, you can keep `yaml` confirutations file at sc like `Git` without the secret data. Try this:
+```
+#decrypt
+$ echo -n 'my-secret-password' |base64
+bXktc2VjcmV0LXBhc3N3b3JkCg==
+#encrypt
+$ echo -n 'bXktc2VjcmV0LXBhc3N3b3JkCg==' |base64 -d
+my-secret-password
+```
 
 ###### Replication Controller
 - Is described under deployments. Manages number of Pods that should run. Adds more if necessary more, remove it the number is too much.
@@ -166,7 +175,10 @@ REST >>> etcd on Masters
 
 ###### UPDATES, ROLLOUT UPDATES
 
-###### HORIZONTAL POD AUTOSCALER (hpa)
+###### AUTO SCALING (HORIZONTAL POD AUTOSCALER) (hpa)
+- HPA - Horizontal Pod Autoscaler will create or remove pods according to maintain avarage resource utilization accross the pods.  
+- https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/  
+- Example % 50 CPU utilization per pod avarage of % 50 per Pod.  
 
 - Some Other Stuff
 ###### CONTAINER HEALTH CHECK
@@ -371,6 +383,15 @@ kubectl expose deployment tomcat-deployment --type=LoadBalancer --port=8080 --ta
 kubectl run mongo-exercise-1 --image=mongo --port 27017
 kubectl scale --replicas=4 deployment/mongo-exercise-1
 
+# AUTO SCALING
+$ kubectl autoscale deployment wordpress --cpu-percent=50 --min=1 --max=5
+# Generate Load
+kubectl run -i --tty load-generator --image=busybox /bin/sh
+while true; do wget -q -O- http://wordpress.default.svc.cluster.local; done
+# Get Auto Scaling
+$ kubectl get hpa 
+
+
 kubectl get persistentvolume
 
 #Update deployment
@@ -390,59 +411,19 @@ kubectl get namespace
 kubectl get resourcequota --namespace=kube-system
 # Create deployment on a Namespace 
 kubectl get deployment --namespace=tomcat-namespace
+
+#Secrets and Secret Volumes
+kubectl create secret generic mysql-pass --from-literal=password=MY_PASSWORD
+kubecat create secret generic mysql-pass --from-file=./username.txt --from-file=./password.txt
 ```
 
-###### DEPLOYMENT/DESCRIPTION BY YAML FILE
-- Pods, Services, Deployments, Networks, Storages, Kubernetes Addons, Namespace etc., all can be described, installed and changed by yaml file like this.  
-- Yaml File Example:
-Config: tomcat-deployment.yml
-```
-# DEPLOYMENT (WHOLE FILE)
-apiVersion: apps/v1beta2
-kind: Deployment
-metadata:
-  name: tomcat-deployment
-spec:
-  selector:
-    matchLabels:
-      app: tomcat
-  # SCALING AND REPLICATION
-  replicas: 4
-  template:
-    metadata:
-      # LABEL
-      labels:
-        app: tomcat
-    spec:
-      containers:
-      - name: tomcat
-        image: tomcat:9.0
-        ports:
-        - containerPort: 8080
-#HEALTH CHECK
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 15
-          periodSeconds: 3
-          # SELECTOR
-          nodeSelector:
-            storageType: ssd
-```
-Apply Deployment (to default namespace):
-```
-kubectl apply -f ./tomcat-deployment.yaml
-```
+###### DEPLOYMENT/DESCRIPTIONS BY YAML FILE
+- Pods, Services, Deployments, Networks, Storages, Kubernetes Addons, Namespace etc., all can be described, installed and changed by yaml file like this.
 
+### TOMCAT DEPLOYMENT
 ###### NAMESPACE BY YAML
-Conf:  tomcat-namespace.yml
+- Yaml File Example:  
+Config Namespace:  tomcat-namespace.yml
 ```
 ---
 apiVersion: v1
@@ -452,7 +433,7 @@ metadata:
 ```
 Command To Apply:
 ```
-kubectl apply -f tomcat.yml
+kubectl apply -f tomcat-namespace.yml
 ```
 
 ###### RESOURCE QUOTA FOR A NAME SPACE
@@ -463,6 +444,7 @@ kubectl apply -f tomcat.yml
 Conf: tomcat-rq.yml
 ```
 apiVersion: v1
+kind: ResourceQuota
 metada:
   name: compute-resources
 spec:
@@ -493,9 +475,62 @@ kubectl create namespace test_namespace
 kubectl get namespace
 kubectl get quota --namespace=myspace
 ```
-Create A Deployment In a Namespace
+
+###### DEPLOYMENT
+Config Deployment: tomcat-deployment.yml
 ```
-kubectl apply -f ./tomcat-deployment.yaml --namespace=tomcat-namespace
+# DEPLOYMENT (WHOLE FILE)
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: tomcat-deployment
+spec:
+  selector:
+    matchLabels:
+      app: tomcat
+  # SCALING AND REPLICATION
+  replicas: 4
+  template:
+    metadata:
+      # LABEL
+      labels:
+        app: tomcat
+    spec:
+      containers:
+      - name: tomcat
+        image: tomcat:9.0
+        ports:
+        - containerPort: 8080
+        # RESOURCE LIMIT
+        resources:
+          limits:
+            cpu: "200m"
+#HEALTH CHECK
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 3
+          # SELECTOR
+          nodeSelector:
+            storageType: ssd
+```
+Apply Deployment (to default namespace):
+```
+kubectl apply -f ./tomcat-deployment.yaml
+```
+Commands To Validate:
+```
+kubectl get deployment --namespace=tomcat-namespace
+kubectl describe deployment tomcat-deployment --namespace=tomcat-namespace
+kubectl edit deployment tomcat-deployment --namespace=tomcat-namespace
 ```
 
 ###### SERVICE
@@ -512,79 +547,226 @@ spec:
   ports:
     - port: 8080
   selector:
-    app: wordpress
-    tier: frontend
+    app: tomcat
   type: LoadBalancer
 ```
 Create The Service:
 ```
 kubectl apply -f ./tomcat-deployment.yaml --namespace=tomcat-namespace
 ```
+Validate Service:
+```
+kubectl get service --namespace=tomcat-namespace
+kubectl describe service tomcat-service --namespace=tomcat-namespace
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
------------------
-# Volume Configuration Separate
+### WORDPRESS - MYSQL DEPLOYMENT
+- From here, new `Objects` will be explained on a new completely new wordpress-mysql deployments.  
+Config: wordpress.yml
 ```
 apiVersion: v1
-kind: PersistentVolume
+kind: Service
 metadata:
-  name: local-pv-1
+  name: wordpress
   labels:
-    type: local
-spec: 
-  storageClassName: manual
-  capacity:
-    storage: 10Gi
-  accessModes: 10Gi
-    - ReadWriteOnce
-  hostPath: "/mnt/data"
--------------------
-# Volume Claim Section Inside Deployment
+    app: wordpress
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: wordpress
+    tier: frontend
+  type: LoadBalancer
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: wp-pv-claim
   labels:
     app: wordpress
-spec: 
-  storageClassName: manual
-  capacity:
-    storage: 10Gi
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20G
+---
+apiVersion: apps/v1beta2 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: frontend
+    spec:
+      containers:
+      - image: wordpress:4.8-apache
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: wordpress-mysql
+        # PLAIN TEXT PASSWORD
+        #- name: WORDPRESS_DB_PASSWORD
+        #  value: PASSWORD_PLAIN-TXT
+        # SECRETS: SECRET KEY REFERENCED PASSWORD
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 80
+          name: wordpress
+        volumeMounts:
+        - name: wordpress-persistent-storage
+          mountPath: /var/www/html
+        resources:
+          requests:
+            cpu: "100m"
+          limits:
+            cpu: "200m"
+      volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: wp-pv-claim
+
+```
+
+Config: mysql.yml
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: wordpress
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: wordpress
+spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 20Gi
--------------------
-# deployment configuration
-
-template:
-  spec: 
-    containers:
-      volumeMounts:
-      - name: wordpress-persistent-storage
-        mountPath: /var/www/html
-    volumes:
-    - name: wordpress-persistent-storage
-      persistentVolumeClaims:
-        claimName: wp-pv-claim  
+---
+apiVersion: apps/v1beta2 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        env:
+        # PASSWORD CLEAR TXT
+       #- name: MYSQL_ROOT_PASSWORD
+       #  value: PASSWORD_CLEAR_TXT
+       # SECRETS: SECRET PASSWORD
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
 ```
 
-### Base64 encoded key value pairs
-To keep human readable data like password, keys to keep to use inside configuration files. Instead of human reabable, It will be a non-human readable hash.
+
+###### AUTO SCALING (hpa)
+- https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/ 
+Config: tomcat-autoscale.yml  
+```
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: tomcat-deployment
+  namespace: tomcat-namespace
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tomcat-deployment
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+```
+Apply AutoScale:
+```
+kubectl apply -f autoscale.yml
+```
+Validate AutoScaling:
+```
+$ kubectl get hpa 
+```
+Create Load To See Scaling:  
+```
+kubectl run -i --tty load-generator --image=busybox /bin/sh
+while true; do wget -q -O- http://wordpress.default.svc.cluster.local; done
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```
 kubectl create secret generic mysql-pass --from-literal=password=MY_PASSWORD
 kubecat create secret generic mysql-pass --from-file=./username.txt --from-file=./password.txt
@@ -617,47 +799,43 @@ volumes:
 
 
 
+###### LOCAL PERSISTENT VOLUME
+- Local Persistent Volumes should not be used in Production as in clusters shared storage is necessary. 
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-pv-1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /tmp/data/pv-1
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-pv-2
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /tmp/data/pv-2
+```
 
 
 
 
-### Auto Scaling
-- HPA - Horizontal Pod Autoscaler will create or remove pods according to maintain avarage CPU utilization accross the pods.  
-- https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/  
-- Example % 50 CPU utilization per pod avarage of % 50 per Pod.  
-```
-$ kubectl autoscake deployment wordpress --cpu-percent=50 --min=1 --max=10
-```
-Create a load generator for testing
-```
-$ kubectl run -i --tty load-generator --image=busybox /bin/sh
-```
-Creating load
-```
-while true; do wget -q -O-http://wordpress.default.svc.cluster.local; done
-```
-Get HPA
-```
-$ kubectl get hpa
-```
-#### Autoscaling Commands
-Since the latest minikube doesn't enable metrics-server by default
-minikube addons enable metrics-server  
-```
-$ kubectl apply -f ./wordpress-deployment.yaml
-```
-```
-$ kubectl autoscale deployment wordpress --cpu-percent=50 --min=1 --max=5
-```
-(In the other terminal)
-```
-kubectl run -i --tty load-generator --image=busybox /bin/sh
-while true; do wget -q -O- http://wordpress.default.svc.cluster.local; done
-```
-(In the first terminal)
-```
-$ kubectl get hpa 
-```
 
 
 
