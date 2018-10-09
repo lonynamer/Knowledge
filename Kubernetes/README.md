@@ -329,6 +329,8 @@ kubectl delete pod `podname`
 kubectl --namespace=<insert-namespace-name-here> run nginx --image=nginx
 kubectl --namespace=<insert-namespace-name-here> get pods
 kubectl config set-context $(kubectl config current-context) --namespace=<insert-namespace-name-here>
+# Create Name Space
+kubectl create namespace tomcat-namespace
 # Validate namespace
 kubectl config view | grep namespace:
 kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
@@ -434,6 +436,8 @@ metadata:
 Command To Apply:
 ```
 kubectl apply -f tomcat-namespace.yml
+# OR
+kubectl create -f tomcat-namespace.yml
 ```
 
 ###### RESOURCE QUOTA FOR A NAME SPACE
@@ -441,12 +445,14 @@ kubectl apply -f tomcat-namespace.yml
 - In trouble shouting, it's important if 3 replicas cannot be created by limits, how many replicaes will create.  
 - https://kubernetes.io/docs/concepts/policy/resource-quotas/  
 
-Conf: tomcat-rq.yml
+Conf: tomcat-resourcequota.yml
 ```
 apiVersion: v1
 kind: ResourceQuota
 metada:
   name: compute-resources
+  # If namespace argument defined, no need to describe in apply command line.
+  namespace: tomcat-deployment
 spec:
   hard:
     pods: "4"
@@ -457,7 +463,9 @@ spec:
     limits.memory: 2Gi  # cannot exceed somehow per namespace
     limits.nvidia.com/gpu: 4 
     # More Quotas
-    #limit.cpu: "400m"  # 400 %
+    #limits.cpu: "400m"  # 400 % cores
+    #limits.cpu: 1       # 1 cores
+    #limits.cpu: 0.1     # % 10 of 1 core
     #configmaps: "10"
     #persistentvolumeclaims: "4"
     #replicationcontrollers: "20"
@@ -467,13 +475,12 @@ spec:
 ```
 Command To Apply: 
 ```
-kubeapply -f tomcat-rq.yml --namespace=tomcat-namespace
+kubeapply -f tomcat-resourcequota.yml --namespace=tomcat-namespace
 ```
 Commands To Validate:
 ```
-kubectl create namespace test_namespace
 kubectl get namespace
-kubectl get quota --namespace=myspace
+kubectl get quota --namespace=tomcat-namespace
 ```
 
 ###### DEPLOYMENT
@@ -556,9 +563,16 @@ kubectl apply -f ./tomcat-deployment.yaml --namespace=tomcat-namespace
 ```
 Validate Service:
 ```
-kubectl get service --namespace=tomcat-namespace
 kubectl describe service tomcat-service --namespace=tomcat-namespace
+kubectl get service --namespace=tomcat-namespace
 ```
+Output:
+```
+NAME             TYPE           CLUSTER-IP     EXTERNAL-IP                                                                  PORT(S)          AGE   SELECTOR
+tomcat-service   LoadBalancer   100.69.78.13   a877b96b8cbb811e8a9ff060cfa30237-1963178646.eu-central-1.elb.amazonaws.com   8080:30574/TCP   52m   app=tomcat
+```
+- Browse to http://a877b96b8cbb811e8a9ff060cfa30237-1963178646.eu-central-1.elb.amazonaws.com:8080/  
+
 
 ### WORDPRESS - MYSQL DEPLOYMENT
 - From here, new `Objects` will be explained on a new completely new wordpress-mysql deployments.  
