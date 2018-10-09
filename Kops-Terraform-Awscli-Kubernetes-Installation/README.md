@@ -5,6 +5,9 @@ WARNING: It's not a secure installation. Only for testing and not production.
 ###### SECURING KUBERNETES CLUSTER
 - https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/
 
+##### ADDONS
+- https://github.com/kubernetes/kops/blob/master/docs/addons.md  
+
 ### Kops Instance Preparations (Install `awscli`, `kubectl`, `terraform` )  
 
 ##### Some good articles  
