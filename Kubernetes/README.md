@@ -503,6 +503,9 @@ spec:
       labels:
         app: tomcat
     spec:
+      # SELECTOR
+      nodeSelector:
+        storageType: ssd
       containers:
       - name: tomcat
         image: tomcat:9.0
@@ -514,6 +517,10 @@ spec:
             cpu: "200m"
 #HEALTH CHECK
         livenessProbe:
+          #exec:
+          #  command:
+          #  - cat
+          #  - /tmp/healthy
           httpGet:
             path: /
             port: 8080
@@ -525,9 +532,6 @@ spec:
             port: 8080
           initialDelaySeconds: 15
           periodSeconds: 3
-          # SELECTOR
-          nodeSelector:
-            storageType: ssd
 ```
 Apply Deployment (to default namespace):
 ```
@@ -865,7 +869,31 @@ rules:
  
 
 
-
+###### LIVENESS READINESS PROBE AND RUNNING A COMMAND IN A CONTAINER AND HEALTH CHECKING
+- https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-exec
+spec:
+  containers:
+  - name: liveness
+    image: k8s.gcr.io/busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
+```
 
    
 
