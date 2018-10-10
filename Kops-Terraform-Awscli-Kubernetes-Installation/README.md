@@ -7,6 +7,7 @@ WARNING: It's not a secure installation. Only for testing and not production.
 ISSUES TO SOLVE:
 ###### SECURING KUBERNETES CLUSTER
 - https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/
+- Make the apiserver -> kubelet communication secure #118
 
 ###### LOGGING
 https://kubernetes.io/docs/concepts/cluster-administration/logging/
