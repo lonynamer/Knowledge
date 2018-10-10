@@ -2,8 +2,18 @@
 ## INSTALLING KUBERNETES ON AWS BY KOPS/AWSCLI WITH/WITHOUT TERRAFORM
 WARNING: It's not a secure installation. Only for testing and not production.  
 - For secure installation, need to take many actions explained here; 
+
+```
+ISSUES TO SOLVE:
 ###### SECURING KUBERNETES CLUSTER
 - https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/
+
+###### LOGGING
+https://kubernetes.io/docs/concepts/cluster-administration/logging/
+###### MONITORING
+
+###### TOM METRICS SERVERS
+```
 
 ###### GOOD ARTICLE LOGGING AND MONITORING
 
