@@ -513,8 +513,12 @@ spec:
         - containerPort: 8080
         # RESOURCE LIMIT
         resources:
+          requests:
+            cpu: "200m"
+            memory: 1Gi
           limits:
             cpu: "200m"
+            memory: 2Gi
 #HEALTH CHECK
         livenessProbe:
           #exec:
