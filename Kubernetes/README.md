@@ -309,6 +309,9 @@ https://<master-ip>:<apiserver-port>/api/v1/namespaces/kube-system/services/http
 ```
 
 ### TECHNICAL, COMMANDS AND YAML DESCRIPTION FOR IaC
+
+###### COMMAND SPEC
+- https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands  
  
 ###### SOME COMMANDS
 `get`, `describe`, `logs`, `edit`, `create`,  `run`, `exec`, `attach`,`delete`, `expose`, `label`, `config`, `set`, `port-forward` are some common commands used after `kubectl` command on `OBJECTS`.  
