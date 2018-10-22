@@ -3,54 +3,26 @@
 ### TERRAFORM  
 ###### What is Terraform and what can be done by Terraform.  
 - (Terra=Earth)(Form=Shaping) Shaping the earth.    
-- Firs released 2014 by HashiCorp. Tool for automation of shaping 
-
-your insfrastructure of your choice.  
-- You can codify a complete DC through archivable version 
-
-controlled code.  
-- Orchestrate across multiple cloud services like AWS, Azure, GCP 
-
-within a single definition. 
+- Firs released 2014 by HashiCorp. Tool for automation of shaping your insfrastructure of your choice.  
+- You can codify a complete DC through archivable version controlled code.  
+- Orchestrate across multiple cloud services like AWS, Azure, GCP within a single definition. 
 - It's cloud agnostic.   
 
 ###### What is infrastructure as code (`IAC`) ?  
-- Describing an infrastructure as a code, keeping in `VCS` like 
-
-`Git` and shaping the infrustructure by code changes done in `Git` 
-
-automatedly by using a CI/CD tool like `Jenkins`, CircleCI, Travis. 
-
- 
+- Describing an infrastructure as a code, keeping in `VCS` like `Git` and shaping the infrustructure by code changes done in `Git` automatedly by using a CI/CD tool like `Jenkins`, CircleCI, Travis.  
 - Same tools and processes software developers use.   
 
-###### How `Terraform` differs from other automation tools like 
-
-Chef, Puppet, Ansible ?  
-- Puppet and chef configuration management tools focuses software 
-
-installation and configuration on machines.  
-- Terraform is used for one level down to shape your infrastructue 
-
-and it's cloud agnostic.  
-- Difference from `CloudFormation`, `Azure ARM (Resource Manager)`, 
-
-`Heat`, it supports multiple clouds.  
-- `Boto and Fog` `API` libraries that focueses on specific clouds 
-
-to provide native access. It provides low-level access.  
+###### How `Terraform` differs from other automation tools like Chef, Puppet, Ansible ?  
+- Puppet and chef configuration management tools focuses software installation and configuration on machines.  
+- Terraform is used for one level down to shape your infrastructue and it's cloud agnostic.  
+- Difference from `CloudFormation`, `Azure ARM (Resource Manager)`, `Heat`, it supports multiple clouds.  
+- `Boto and Fog` `API` libraries that focueses on specific clouds to provide native access. It provides low-level access.  
 - Easier syntax.  
-- Terraform manages any resource and tools required to automate the 
-
-building of infrastructure. No need to learn and manage tools.  
+- Terraform manages any resource and tools required to automate the building of infrastructure. No need to learn and manage tools.  
 
 ###### Advantages of `Terraform`  
-- Orchestrate multiple services/provides in a single definition as 
-
-a single solution for many solutions.  
-- Build in protection for when you need to add more solutions 
-
-later.  
+- Orchestrate multiple services/provides in a single definition as a single solution for many solutions.  
+- Build in protection for when you need to add more solutions later.  
 - It's very popular and had been market standard.  
 
 ### INSTALLATION OF TERRAFORM
@@ -63,22 +35,12 @@ later.
 sudo apt-get install update
 sudo apt-get -y install unzip jq curl
 function terraform-install() {
-  [[ -f ${HOME}/bin/terraform ]] && echo "`${HOME}/bin/terraform 
-
-version` already installed at ${HOME}/bin/terraform" && return 0
-  LATEST_URL=$(curl -sL 
-
-https://releases.hashicorp.com/terraform/index.json | jq -r 
-
-'.versions[].builds[].url' | sort --version-sort | egrep -v 'rc|
-
-beta' | egrep 'linux.*amd64' |tail -1)
+  [[ -f ${HOME}/bin/terraform ]] && echo "`${HOME}/bin/terraform version` already installed at ${HOME}/bin/terraform" && return 0
+  LATEST_URL=$(curl -sL https://releases.hashicorp.com/terraform/index.json | jq -r '.versions[].builds[].url' | sort --version-sort | egrep -v 'rc|beta' | egrep 'linux.*amd64' |tail -1)
   curl ${LATEST_URL} > /tmp/terraform.zip
   mkdir -p ${HOME}/bin
   (cd ${HOME}/bin && unzip /tmp/terraform.zip)
-  if [[ -z $(grep 'export PATH=${HOME}/bin:${PATH}' ~/.bashrc) ]]; 
-
-then
+  if [[ -z $(grep 'export PATH=${HOME}/bin:${PATH}' ~/.bashrc) ]]; then
   	echo 'export PATH=${HOME}/bin:${PATH}' >> ~/.bashrc
   fi
   
@@ -101,9 +63,7 @@ terraform version
 ###### Installation on Windows  
 - Download zip file.  
 - Extract to a directory.  
-- Add the path where files extracted, to `Path` key in `User 
-
-Environment Variables`.  
+- Add the path where files extracted, to `Path` key in `User Environment Variables`.  
 - Validate the installation.  
 ```
 terraform version
@@ -127,16 +87,12 @@ instance_type = "t2.micro"
 }
 
 ###### Run
-- init: Initializes, does the first configuration and plugins like 
-
-aws provider described in `tf` file.  
+- init: Initializes, does the first configuration and plugins like aws provider described in `tf` file.  
 ```
 terraform init
 ```
 - plan: Shows you a list of options you can apply.  
-- You can add those parameters to the configuration file for more 
-
-specific configurations.  
+- You can add those parameters to the configuration file for more specific configurations.  
 ```
 terraform plan
 ```
@@ -148,21 +104,11 @@ terraform apply
 ```
 terraform show
 ```
-- destroy: Destroys the configuration described in terraform.tf 
-
-file.  
+- destroy: Destroys the configuration described in terraform.tf file.  
 ```
 terraform destroy
 ```
-- Additionally terraform creates a file `terraform.tfstate` which 
-
-keeps state of the current infrastructure in JSON format during 
-
-`apply`. Do not edit it. When you `destoy` or change, it creates 
-
-`terraform.tfstate.backup` file to keep the track of previous 
-
-state. 
+- Additionally terraform creates a file `terraform.tfstate` which keeps state of the current infrastructure in JSON format during `apply`. Do not edit it. When you `destoy` or change, it creates `terraform.tfstate.backup` file to keep the track of previous state. 
 
 
 ### Terraform Basics:  
@@ -176,9 +122,7 @@ state.
 ###### Config File Structure:
 - `HCL` language (HashiCorp Configuration Language).  
 - `HCL` and `JSON` are interoperable.  
-- It can also understand JSON but it's harder and less human 
-
-readable.  
+- It can also understand JSON but it's harder and less human readable.  
 - Syntax allows hierarchies of sections.  
 ```
 ## Comment
@@ -261,9 +205,7 @@ lifecycle {
   create_before_destroy = true
 }
 ```
-- Prevent Destroy: It will not let you destroy and will give error 
-
-during plan  
+- Prevent Destroy: It will not let you destroy and will give error during plan  
 ```
 lifecycle {
   prevent_destroy = true
@@ -311,13 +253,9 @@ lifecycle {
 ```
 
 #### PROVIDERS
-- Providers are generally IaaS or SaaS services and responsible for 
-
-understanding API interactions and exposing resources.  
+- Providers are generally IaaS or SaaS services and responsible for understanding API interactions and exposing resources.  
 - https://www.terraform.io/docs/providers/index.html  
-- `terraform init` command download/provides latest version of 
-
-provider by descriptions in your code.  
+- `terraform init` command download/provides latest version of provider by descriptions in your code.  
 - Multiple providers possible to use.  
 
 Config: terraform.tf
@@ -412,9 +350,7 @@ zones = ["eu-central-1a", "eu-central-1b"]
 ```
 Run:
 ```
-terraform apply -var-file=var_file_example.tfvars -var-
-
-file=bar.tfvars
+terraform apply -var-file=var_file_example.tfvars -var-file=bar.tfvars
 ```
 
 ###### VARIABLES IN COMMAND LINE PIPED / EXPORTED
@@ -452,17 +388,9 @@ resource "aws_instance" "demo" {
 ```
 
 #### OUTPUT ATTRIBUTES
-- Outputing attriput provides getting information from our 
-
-deployment, like private ip, public ip, dns name of an instance 
-
-that we create and use as variable for another issue.  
-- `'sensitive'[bbolean]`(boolean) - Indicates sensitive material 
-
-within the block; set attribute to `"=true"`.  
-- `'depends_on'`[ list of strings] - creates dependencies before 
-
-the output is value is processed.
+- Outputing attriput provides getting information from our deployment, like private ip, public ip, dns name of an instance that we create and use as variable for another issue.  
+- `'sensitive'[bbolean]`(boolean) - Indicates sensitive material within the block; set attribute to `"=true"`.  
+- `'depends_on'`[ list of strings] - creates dependencies before the output is value is processed.
 - `'description'` - to set a description.
 ```
 output "name" {
@@ -504,18 +432,12 @@ output "demo_private_ips" {
 ```
 
 ###### EXERCISE WITH THE KNOWLEDGE TILL HERE
-- Create a 2 backend and 2 frontend servers in 2 different 
-
-availability zones and regions in AWS.  
-- Set frontend servers as create before destroy and backend servers 
-
-prevent destroy in lifecycle.  
+- Create a 2 backend and 2 frontend servers in 2 different availability zones and regions in AWS.  
+- Set frontend servers as create before destroy and backend servers prevent destroy in lifecycle.  
 - Set creation and deletetion timeouts 5 minutes.    
 - Use variables for availability zones.  
 - output public and private ip address of all servers.  
-- frontend servers should depend on backend servers of it's 
-
-availability zone.  
+- frontend servers should depend on backend servers of it's availability zone.  
 ```
 provider "aws" {
 access_key = "ACCESS_KEY"
@@ -648,9 +570,7 @@ resource "aws_instance" "vpn" {
 }
 ```
 
-###### BUILT-IN FUNCTIONS: concat, join, contains, merge, length, 
-
-replace
+###### BUILT-IN FUNCTIONS: concat, join, contains, merge, length, replace
 - `concat` : Blends 2 lists into one.  
 ```
 concat(aws_instance,db,*,tags.Name, aws_instance.web.*.tags.Name)
@@ -683,15 +603,11 @@ ${length(map("key", "val"))} = 1
 ###### TERRAFORM CONSOLE COMMAND
 - It's a command to perform experimantal math operations.  
 - terraform console[options][dirs]  
-- Use this console to test out your interpolations before using 
-
-them within configurations.  
+- Use this console to test out your interpolations before using them within configurations.  
 ```
 echo "2 + 2" | terraform console
 ```
-- You can test all the interpolation expressions in terraform 
-
-console by typing;  
+- You can test all the interpolation expressions in terraform console by typing;  
 ```
 terraform console
 ```
@@ -792,24 +708,16 @@ output "west_backend_ips" {
 
 ###### LOCALS
 - Assigned name expressions.  
-- Use locals instead of variable when you need to use expressions 
-
-and don't want to write again and again a lot of variables, by 
-
-expressions it will have a logic to generate.  
+- Use locals instead of variable when you need to use expressions and don't want to write again and again a lot of variables, by expressions it will have a logic to generate.  
 Example:  
 ```
 locals {
-  instance_ids = "${concat(aws_instance.blue.*id), 
-
-aws_instance.green.*.id}"
+  instance_ids = "${concat(aws_instance.blue.*id), aws_instance.green.*.id}"
 }
 
 locals { 
   default_name_prefix = "${var.project_name}-web"
-  name_prefix = "${var.name_prefix != "" ? var.name_prefix : 
-
-local.default_name_prefix}"
+  name_prefix = "${var.name_prefix != "" ? var.name_prefix : local.default_name_prefix}"
 }
 
 resource "aws_s3_bucket" "files" {
@@ -947,9 +855,7 @@ output "backend-paris" {
 
 ###### DATA SOURCES: data
 - Read only information outside of Terraform.  
-- Example: Get list of ip ranges of ec2 service filter by 2 
-
-regions. Later you can use this data for firewall rules etc.    
+- Example: Get list of ip ranges of ec2 service filter by 2 regions. Later you can use this data for firewall rules etc.    
 ```
 data "aws_ip_ranges" "european-ec2" {
   regions = ["eu-central-1", "eu-west-3"]
@@ -975,12 +881,8 @@ instance_type = "t2.micro"
 ```
 
 - Meta-parameters & Multiplr Provider Instances:  
-  - Maintain the same meta-marameters of resources except lifecycle 
-
-configuration block.  
-  - Can also be used with multiple aliased instances of the same 
-
-provider.
+  - Maintain the same meta-marameters of resources except lifecycle configuration block.  
+  - Can also be used with multiple aliased instances of the same provider.
 - Example:  
 ```
 data "aws_ami" "web" {
@@ -1017,9 +919,7 @@ data "aws_availability_zones" "paris-region" {
 
 resource "aws_instance" "frontend" {
   count             = 2
-  availability_zone = "${data.aws_availability_zones.eu-central-
-
-1.names[count.index]}"
+  availability_zone = "${data.aws_availability_zones.eu-central-1.names[count.index]}"
   ami               = "ami-086a09d5b9fa35dc7"
   instance_type     = "t2.micro"
 }
@@ -1028,9 +928,7 @@ resource "aws_instance" "frontend-paris" {
   count             = 2
   provider          = "aws.paris"
   ami               = "ami-075b44448d2276521"
-  availability_zone = "${data.aws_availability_zones.paris-
-
-region.names[count.index]}"
+  availability_zone = "${data.aws_availability_zones.paris-region.names[count.index]}"
   instance_type     = "t2.micro"
 }
 
@@ -1048,16 +946,10 @@ output "zone-ips" {
 ```
 
 #### MODULES
-- Self-contained packages of configurations used to create reusable 
-
-Terraform elements to help your code organized and also managing as 
-
-a group.  
+- Self-contained packages of configurations used to create reusable Terraform elements to help your code organized and also managing as a group.  
 - Usage: You can use third party modules or local modules.  
 - When using modules, you define a source and name.  
-- Third party modules are installed from Terraform and installed by 
-
-`terraform init` command.  
+- Third party modules are installed from Terraform and installed by `terraform init` command.  
 - https://registry.terraform.com/  
 - Important to check modules that are verified by `HashiCorp`  
 
@@ -1130,9 +1022,7 @@ resource "aws_instance" "instance" {
   count                 = "${var.total_instances}"
   ami                   = "${var.amis[var.region]}"
   instance_type         = "t2.micro"
-  availability_zone     = 
-
-"${data.aws_availability_zones.available.names[count.index]}"
+  availability_zone     = "${data.aws_availability_zones.available.names[count.index]}"
 }
 ```
 Config: outputs.tf
@@ -1172,15 +1062,9 @@ variable "aws_secret_key" {}
 ```
 
 #### Backends and Remote State, Proviles and Credentials  
-- `Backend` is local for large teams, you need to use SCM and put 
-
-to git.   
-- To keep terraform state `terraform.tfstate` need to set up a 
-
-remote backend instead of local for collaboration, CI and CD.  
-- Backend Types:  artifactory, azurem, consul, etcd, etcdv3, gcs, 
-
-http, manta, swift, terraform enterprise.  
+- `Backend` is local for large teams, you need to use SCM and put to git.   
+- To keep terraform state `terraform.tfstate` need to set up a remote backend instead of local for collaboration, CI and CD.  
+- Backend Types:  artifactory, azurem, consul, etcd, etcdv3, gcs, http, manta, swift, terraform enterprise.  
 Setting up `Backend` at `S3`:  
 - First create a S3 bucket.   
 ```
@@ -1193,9 +1077,7 @@ terraform {
 }
 ```
 Setting up `Backend` at `Consul`:  
-- https://blog.codeship.com/terraform-remote-state-with-consul-
-
-backend/  
+- https://blog.codeship.com/terraform-remote-state-with-consul-backend/  
 ```
 terraform {
   backend "consul" {
@@ -1233,23 +1115,13 @@ terraform init
 ```
 
 #### WORKSPACES
-- A named container to keep states and rename state file meant to 
-
-keep in a shared resource.  
-- Multiple workspace are available with these backends: AzureRM, 
-
-Consul, GCS, Local, Manta.  
-- Example you can create workspace for `production`, `staging` etc. 
-
- The first one is default.  
+- A named container to keep states and rename state file meant to keep in a shared resource.  
+- Multiple workspace are available with these backends: AzureRM, Consul, GCS, Local, Manta.  
+- Example you can create workspace for `production`, `staging` etc.  The first one is default.  
 - You cannot delete wotkspaces.  
 - Creating a workspace  
-- Use workspaces to deal with small differences between 
-
-development, staging, production.  
-- Make it manageable and safe to split a large configuration into 
-
-smaller ones.  
+- Use workspaces to deal with small differences between development, staging, production.  
+- Make it manageable and safe to split a large configuration into smaller ones.  
 ```
 terraform workspace new staging
 terraform workspace list
@@ -1263,9 +1135,7 @@ provider "aws" {
 }
 
 locals {
-  default_name = "${join("-", list(terraform.workspace, 
-
-"example"))}"
+  default_name = "${join("-", list(terraform.workspace, "example"))}"
 }
 
 resource "aws_instance" "example" {
@@ -1279,13 +1149,7 @@ resource "aws_instance" "example" {
 ```
 
 #### SOFTWARE PROVISIONING WITH PROVISIONERS
-- Software Provisioner: help executing scripts on a local or remote 
-
-machine.  Many provisioners require access to the remote resource 
-
-`SSH` port `22` or `WINRM` port `5985`. Any connection information 
-
-used in a resource applies to all provisioners.  
+- Software Provisioner: help executing scripts on a local or remote machine.  Many provisioners require access to the remote resource `SSH` port `22` or `WINRM` port `5985`. Any connection information used in a resource applies to all provisioners.  
   - Userdata  
   - Remote exec
   - Local exec  
@@ -1297,23 +1161,11 @@ used in a resource applies to all provisioners.
   - Host  
   - Port  
   - Timeout  
-- File Provisioner: Is a type of provisioner to transfer files to 
-
-the servers by same protocols.  
-- When you create a `local-exec` or `remote-exec` provisioner. You 
-
-will use `command` or `inline` arguement. `command` is one line of 
-
-code. `inline` is for a block of a code in list format. `local-
-
-exec` uses `command` and don't know `inline`. `remote-exec` knows 
-
-`inline`.  
+- File Provisioner: Is a type of provisioner to transfer files to the servers by same protocols.  
+- When you create a `local-exec` or `remote-exec` provisioner. You will use `command` or `inline` arguement. `command` is one line of code. `inline` is for a block of a code in list format. `local-exec` uses `command` and don't know `inline`. `remote-exec` knows `inline`.  
 
 DEMO:  
-- Create some files to execute on remote and configure. The first 
-
-one a php script.    
+- Create some files to execute on remote and configure. The first one a php script.    
 ```
 mkdir frontend
 echo "HELLOWORLD" > frontend/index.php
@@ -1352,9 +1204,7 @@ server {
   location ~* \.php$ {
     fastcgi_pass unix:/run/php/php7.0-fpm.sock;
     include         fastcgi_params;
-    fastcgi_param   SCRIPT_FILENAME    $document_root
-
-$fastcgi_script_name;
+    fastcgi_param   SCRIPT_FILENAME    $document_root$fastcgi_script_name;
     fastcgi_param   SCRIPT_NAME        $fastcgi_script_name;
   }
 }
@@ -1453,9 +1303,7 @@ terraform show
 #### SOFTWARE PROVISIONING WITH ANSIBLE
 - Need to learn ansible as it's a different `CM` tools.  
 - Terraform will build the servers and ansible will configure.  
-- Let's do the same we did by `remote-exec` with ansible and 
-
-`local-exec`.    
+- Let's do the same we did by `remote-exec` with ansible and `local-exec`.    
 - We use ubuntu. Create a `sh` file that installs ansible.   
 File: scripts/install_ansible_git.sh  
 ```
@@ -1525,9 +1373,7 @@ data "aws_availability_zones" "available_az" {}
 
 resource "aws_security_group" "nginx-sg" {
   name = "nginx-name"
-  description = "ssh http inbound and all out bound for nginx 
-
-server"
+  description = "ssh http inbound and all out bound for nginx server"
   ingress {
     from_port = "22"
     to_port = "22"
@@ -1553,9 +1399,7 @@ resource "aws_instance" "frontend" {
   ami = "ami-086a09d5b9fa35dc7"
   instance_type = "t2.micro"
   vpc_security_group_ids = ["${aws_security_group.nginx-sg.*.id}"]
-  availability_zone = 
-
-"${data.aws_availability_zones.available_az.names[count.index]}"
+  availability_zone = "${data.aws_availability_zones.available_az.names[count.index]}"
   key_name = "JenkinsOnUbuntu"
 
   tags {
@@ -1569,9 +1413,7 @@ resource "aws_instance" "frontend" {
   }
 
   provisioner "remote-exec" {
-    # The connection will use the local SSH agent for 
-
-authentication
+    # The connection will use the local SSH agent for authentication
     inline = ["echo Successfully connected"]
 
   }
@@ -1592,11 +1434,7 @@ resource "null_resource" "install_ansible" {
 resource "null_resource" "ansible-provision" {
   depends_on = [ "aws_instance.frontend" ]
   provisioner "local-exec" {
-    command = "ansible-playbook --private-key=${var.ssh_key}  --
-
-ssh-common-args='-o StrictHostKeyChecking=no' -i 
-
-'${aws_instance.frontend.public_ip},' ansible-configure.yml"
+    command = "ansible-playbook --private-key=${var.ssh_key}  --ssh-common-args='-o StrictHostKeyChecking=no' -i '${aws_instance.frontend.public_ip},' ansible-configure.yml"
   }
 }
 
@@ -1620,56 +1458,22 @@ output "frontend_ip" {
   - Real-Life Examples  
 
 ###### VPC  
-VPC:  VPCs are isolated virtual private networks in cloud. VPCs are 
-
-used and configured by adjusting IP range, subnets, route tables, 
-
-network gateways and security settings for isolating instance on a 
-
-network level. It can be public or private.  
+VPC:  VPCs are isolated virtual private networks in cloud. VPCs are used and configured by adjusting IP range, subnets, route tables, network gateways and security settings for isolating instance on a network level. It can be public or private.  
 Some components:  
 - `Internet Gateways`:  For providing inbound internet access.  
-- `NAT Gateways`:  For providing outbound traffic to private 
-
-subnets. Possible to attach elastic IP.  
-- `Routes and Route Tables`: Route tables connected to your public 
-
-subnet, as well as custom route tables allows usage of Internet 
-
-Gateways and NAT gateways for inbound and outbound traffic.  
-- `NACLs`:  Osi 2 layered, stateless, order listed, network layer 
-
-security solution. It can do also deny.  
-- `Security Groups`:  For allowing traffic. Object firewall. Osi 
-
-3+, firewall for EC2 instances.  There is no deny, only allow.    
-- `Subnets`:  VPC subnets must and can be linked to one route 
-
-table. You can link multiple subnets to the same route table.  
+- `NAT Gateways`:  For providing outbound traffic to private subnets. Possible to attach elastic IP.  
+- `Routes and Route Tables`: Route tables connected to your public subnet, as well as custom route tables allows usage of Internet Gateways and NAT gateways for inbound and outbound traffic.  
+- `NACLs`:  Osi 2 layered, stateless, order listed, network layer security solution. It can do also deny.  
+- `Security Groups`:  For allowing traffic. Object firewall. Osi 3+, firewall for EC2 instances.  There is no deny, only allow.    
+- `Subnets`:  VPC subnets must and can be linked to one route table. You can link multiple subnets to the same route table.  
 Example:  
 ```
-Creating one VPC with a cidr block, 2 public subnets for webservers 
-
-separated each in a different availability zone and 2 private 
-
-subnets separated each in a different availability zone and setting 
-
-up an internet gateway for internet access.
+Creating one VPC with a cidr block, 2 public subnets for webservers separated each in a different availability zone and 2 private subnets separated each in a different availability zone and setting up an internet gateway for internet access.
 ```
 
 - Create a VPC by using `module` in code.  
-- Modulel Usage Page: 
-
-https://registry.terraform.io/modules/terraform-aws-
-
-modules/vpc/aws/1.46.0  
-- If you need to read the codes and get mode information, you can 
-
-read the source code by clicking the link in the module page.  Also 
-
-it may be a good place to learn how to do by plugin and write your 
-
-own code or module.  
+- Modulel Usage Page: https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/1.46.0  
+- If you need to read the codes and get mode information, you can read the source code by clicking the link in the module page.  Also it may be a good place to learn how to do by plugin and write your own code or module.  
 - https://github.com/terraform-aws-modules/terraform-aws-vpc  
 ```
 provider "aws" {
@@ -1705,15 +1509,7 @@ resource "aws_ebs_volume" "test" {
 ```
 
 ###### EBS
-- Every instance has a root EBS volume. Elastic block storage. Good 
-
-practice is keeping your data in an additional EBS volume, so if 
-
-your instance will be deleted, your data is kept if you set not to 
-
-delete with the instance option. You can also take snapshots to 
-
-EBS's and use in clusters.  
+- Every instance has a root EBS volume. Elastic block storage. Good practice is keeping your data in an additional EBS volume, so if your instance will be deleted, your data is kept if you set not to delete with the instance option. You can also take snapshots to EBS's and use in clusters.  
 
 ```
 provider "aws" {
@@ -1733,19 +1529,7 @@ resource "aws_ebs_volume" "test" {
 ```
  
 ###### IAM
-- Identity & Access Management: A directory service designed for 
-
-trackins system users, provide identity management and access 
-
-permit and deny action on resources. Can configure shared access by 
-
-delegating permissions. Multi factor authentication can be setup. 
-
-Cloud security can be centralized and standardized. Temporary 
-
-access, control the type of operations, access across accounts, all 
-
-possible.   
+- Identity & Access Management: A directory service designed for trackins system users, provide identity management and access permit and deny action on resources. Can configure shared access by delegating permissions. Multi factor authentication can be setup. Cloud security can be centralized and standardized. Temporary access, control the type of operations, access across accounts, all possible.   
   - IAM Roles:  A pack of policies.  
   - IAM Policies: Predefined permissions.  
   - IAM Groups:  A pack of identities like users.  
@@ -1760,9 +1544,7 @@ default = "/"
 
 
 variable "force_destroy" {
-description = "Delete non-terraform managed IAM keys, login 
-
-profiles and MFA."
+description = "Delete non-terraform managed IAM keys, login profiles and MFA."
 default = true
 }
 ```
@@ -1822,13 +1604,7 @@ EOF
 ```
 
 ###### ROUTE53
-- Highly available and scalable Domain Name System (DNS). Allows to 
-
-map domain names to instances and S3. Aliases are different than 
-
-CNAMEs and extends DNS functionality like you can map to a 
-
-loadbalancer.
+- Highly available and scalable Domain Name System (DNS). Allows to map domain names to instances and S3. Aliases are different than CNAMEs and extends DNS functionality like you can map to a loadbalancer.
 Demo: Creating a zone and adding a record.  
 Config: Terraform    
 ```
@@ -1853,27 +1629,15 @@ resource "aws_route53_record" "www" {
 ```
 
 ###### AUTOSCALING
-- Build automatic scaling plans for infrastructure resources 
-
-holding a collections of similar characteristics instances to build 
-
-resilient  application infrastructure.  
+- Build automatic scaling plans for infrastructure resources holding a collections of similar characteristics instances to build resilient  application infrastructure.  
 - You need to define 2 resources;  
   - Launch config: propertices of instances.  
-  - Autoscaling group and plicies by cloud watch alarms.  - Reacts 
-
-well to load changes and scales, cost saving and supports work 
-
-loads.  
+  - Autoscaling group and plicies by cloud watch alarms.  - Reacts well to load changes and scales, cost saving and supports work loads.  
 
 - You can use spot instances as well.  
 - Manual launch configuration is like creating an instance.  
-- Lifecycle hooks: Tou run, notify or call something when 
-
-autoscaling works.  
-Demo: Create a autoscaling group, launch configuration including 
-
-and instance installed nginx with loadbalancer.  
+- Lifecycle hooks: Tou run, notify or call something when autoscaling works.  
+Demo: Create a autoscaling group, launch configuration including and instance installed nginx with loadbalancer.  
 Config: terraform.tf  
 ```
 provider "aws" {
@@ -1920,9 +1684,7 @@ module "example_asg" {
   name = "example-with-elb"
 
 # Launch configuration
-# create_lc = false  # disables the creation of lc, so you use the 
-
-created.
+# create_lc = false  # disables the creation of lc, so you use the created.
   lc_name = "example-lc"
   image_id = "${data.aws_ami.amazon_linux.id}"
   instance_type = "t2.micro"
@@ -2012,11 +1774,7 @@ created.
 ```
 
 ###### RDS
-- RDS helps to build, run and scale databases through the AWS 
-
-managed services. Allows you to spin up multiple relational 
-
-database engines in the cloud at the same time.  
+- RDS helps to build, run and scale databases through the AWS managed services. Allows you to spin up multiple relational database engines in the cloud at the same time.  
   - Aurora: Mysql or Postgresql type  
   - Mysql  
   - MariaDB  
@@ -2025,9 +1783,7 @@ database engines in the cloud at the same time.
   - PostgreSQL  
 - RDS maintains many standard database management tasks for you.  
 - Cost effective and resizable.  
-- Helps predict impending issues or capacity constrains before 
-
-performance or availability is affected.  
+- Helps predict impending issues or capacity constrains before performance or availability is affected.  
 
 Upgrade Options:
 - Upgrades can be done automatically and there are 2 types.  
@@ -2036,36 +1792,18 @@ Upgrade Options:
 - Some resources:  
 - https://www.terraform.io/docs/providers/aws/d/db_instance.html  
 - https://github.com/terraform-aws-modules/terraform-aws-rds  
-- https://registry.terraform.io/modules/terraform-aws-
-
-modules/rds/aws/1.0.2  
+- https://registry.terraform.io/modules/terraform-aws-modules/rds/aws/1.0.2  
 
 Maintenance Windows:  
 - A chance to control when modifications and patching occur.  
-- DB instances and DB clusters have weekly maintenance windows for 
-
-system changes.  
-- If needed maintanence windows are completed in 30 minute slots 
-
-which you assign or are slotted in at random.  
+- DB instances and DB clusters have weekly maintenance windows for system changes.  
+- If needed maintanence windows are completed in 30 minute slots which you assign or are slotted in at random.  
 
 High-Availability Options:
-- HA provides failover support through multi-Availability Zone 
-
-deployment.  
-- Running DB instances with HA, enhances availability during 
-
-planned system maintenance. Safeguards your databases against DB 
-
-instance failure and AZ disruption.  
-- Database size is resizable, as much as space you have more IOPS 
-
-you will have, in a real production environment start with minimum 
-
-200 GB due to this reason.  
-- AWS offer recovery resolution to every 1 minute in time, best 
-
-practise use 35 days retention period.  
+- HA provides failover support through multi-Availability Zone deployment.  
+- Running DB instances with HA, enhances availability during planned system maintenance. Safeguards your databases against DB instance failure and AZ disruption.  
+- Database size is resizable, as much as space you have more IOPS you will have, in a real production environment start with minimum 200 GB due to this reason.  
+- AWS offer recovery resolution to every 1 minute in time, best practise use 35 days retention period.  
 
 Demo: Creating a database by plugin `aws_db_instance`  
 Config: terraform.tf  
@@ -2159,9 +1897,7 @@ resource "aws_db_instance" "default" {
   storage_type              = "gp2"
   allocated_storage         = 20
   storage_encrypted         = false
-# kms_key_id                = "arm:aws:kms:<region>:<accound 
-
-id>:key/<kms key id>"
+# kms_key_id                = "arm:aws:kms:<region>:<accound id>:key/<kms key id>"
   name                      = "demodb"
   username                  = "user"
   password                  = "pass-1234"
@@ -2219,28 +1955,20 @@ module "db" {
 
   identifier = "demodb"
 
-  # All available versions: 
-
-http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.ht
-
-ml#MySQL.Concepts.VersionMgmt
+  # All available versions: http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html#MySQL.Concepts.VersionMgmt
   engine            = "mysql"
   engine_version    = "5.7.19"
   instance_class    = "db.t2.micro"
   allocated_storage = 5
   storage_encrypted = false
 
-  # kms_key_id        = "arm:aws:kms:<region>:<accound id>:key/<kms 
-
-key id>"
+  # kms_key_id        = "arm:aws:kms:<region>:<accound id>:key/<kms key id>"
   name     = "demodb"
   username = "user"
   password = "YourPwdShouldBeLongAndSecure!"
   port     = "3306"
 
-  vpc_security_group_ids = 
-
-["${data.aws_security_group.default.id}"]
+  vpc_security_group_ids = ["${data.aws_security_group.default.id}"]
 
   maintenance_window = "Mon:00:00-Mon:03:00"
   backup_window      = "03:00-06:00"
@@ -2265,27 +1993,15 @@ key id>"
 ```
 
 ###### LOADBALANCING
-- Balancing, dstributing incoming traffic and scales resources to 
-
-meet traffic demands.  Layer 3 (network) or Layer 7 (application) 
-
-balancing possible, detects health.  
-- You can assign security group and attach "SSL" certs for your 
-
-site adding HTTPS.  
+- Balancing, dstributing incoming traffic and scales resources to meet traffic demands.  Layer 3 (network) or Layer 7 (application) balancing possible, detects health.  
+- You can assign security group and attach "SSL" certs for your site adding HTTPS.  
 - You can configure health check.  
 - Type:  
-  - Application LBs:  Application layer and features for 
-
-applications. Also provides more monitoring. You need to use target 
-
-groups.  
+  - Application LBs:  Application layer and features for applications. Also provides more monitoring. You need to use target groups.  
   - Classic LBs:  Network layer and multi AZs.  
   - Network LBs:  
 - Attachments: Attaching instances or resources.  
-Demo: Creating an instance with classic load balancer and attaching 
-
-the instance.  
+Demo: Creating an instance with classic load balancer and attaching the instance.  
 Config: terraform.tf  
 ```
 provider "aws" {
@@ -2397,11 +2113,7 @@ EOF
 }
 ```
 
-Demo: Creating an a`pplication loadbalancer`, `target group`, 
-
-`attachment to target group`, `listener` and `instances` to attach 
-
-to target group.  
+Demo: Creating an a`pplication loadbalancer`, `target group`, `attachment to target group`, `listener` and `instances` to attach to target group.  
 Config: terraform.tf    
 ```
 provider "aws" {
@@ -2523,29 +2235,15 @@ output "external_address" {
 
 
 ###### LAMBDA
-- It's a serverless compute service that runs code in response to 
-
-events without provisioning or managing servers. Lambda 
-
-automatically manages the underlying compute resources for you.  
+- It's a serverless compute service that runs code in response to events without provisioning or managing servers. Lambda automatically manages the underlying compute resources for you.  
 
 - Usage and Benefots of Lambda  
-  - Smaller on-demand applications that are responsive to events 
-
-and new information.  
+  - Smaller on-demand applications that are responsive to events and new information.  
   - Event-driven execute code only when needed.  
-  - Scales automatically from a few requests a day to thousands per 
-
-second. Only pay for time consumed.  
+  - Scales automatically from a few requests a day to thousands per second. Only pay for time consumed.  
   - Supports versioning.  
-- Languages Supported: C# (.Net Core), Java, NodeJS, Go, Phython, 
-
-Go.  
-Demo: Zip a python 3.6 file and upload to lambda during creation, 
-
-get some policies and create an iam role for lambda function, 
-
-create the lambda function.  
+- Languages Supported: C# (.Net Core), Java, NodeJS, Go, Phython, Go.  
+Demo: Zip a python 3.6 file and upload to lambda during creation, get some policies and create an iam role for lambda function, create the lambda function.  
 Python 3.6 code: hello_lambda.py
 ```
 import os
@@ -2584,9 +2282,7 @@ data "aws_iam_policy_document" "policy" {
 
 resource "aws_iam_role" "iam_for_lambda" {
   name               = "iam_for_lambda"
-  assume_role_policy = 
-
-"${data.aws_iam_policy_document.policy.json}"
+  assume_role_policy = "${data.aws_iam_policy_document.policy.json}"
 }
 
 resource "aws_lambda_function" "lambda" {
@@ -2612,54 +2308,20 @@ resource "aws_lambda_function" "lambda" {
 
 
 #### TERRAFORM USAGE WITH KUBERNETES IN GOOGLE COLUD (GCP)
-- Kubernetes: Kubernetes is an open-source platform designed to 
-
-automate deploying, scaling and operating application containers 
-
-developed by Google. Nickname K8S and it's goal to foster an 
-
-ecosystem of components and tools that releive the burden og 
-
-running applications. Can orchestrate Dockers and Rocket 
-
-containers.  
-- Kubernetes, runs everywhere, extenible, open source and self-
-
-healing.  Leader, has massive community and market standard.  
-- It covers all issues to run an application and micro services; 
-
-Load balancing, storage, secrets, scaling, rolling updates, 
-
-debugging, logging, monitoring.  
+- Kubernetes: Kubernetes is an open-source platform designed to automate deploying, scaling and operating application containers developed by Google. Nickname K8S and it's goal to foster an ecosystem of components and tools that releive the burden og running applications. Can orchestrate Dockers and Rocket containers.  
+- Kubernetes, runs everywhere, extenible, open source and self-healing.  Leader, has massive community and market standard.  
+- It covers all issues to run an application and micro services; Load balancing, storage, secrets, scaling, rolling updates, debugging, logging, monitoring.  
 - `GKE` : GCP managed kubernetes services.  
-- Nodepools:  Subset of machines defining local SSDs, CPU platform, 
-
-Preemptible VMs, Node images, instance sizes, machine sizes. Custom 
-
-nodeppols are great, if you need more resources in comparison to 
-
-others.  
+- Nodepools:  Subset of machines defining local SSDs, CPU platform, Preemptible VMs, Node images, instance sizes, machine sizes. Custom nodeppols are great, if you need more resources in comparison to others.  
 
 ###### INSTALLING K8S ON GCP  
 Prerequisities:  
-- When you first register to GCP with your gmail, you will get 300 
-
-$ credit for testing.  
+- When you first register to GCP with your gmail, you will get 300 $ credit for testing.  
 - Gcloud SDK installed locally and authenticated  
 - Gcloud project and billing setup.  
-- GKE api enabled. Enabling API means relating your project which 
+- GKE api enabled. Enabling API means relating your project which you will create during GCP SDK installation, to a billing account.  Please do it after GCP SDK installation, Kubernetes Engines, select project from top and associate. This will enable the GKE API.  
 
-you will create during GCP SDK installation, to a billing account.  
-
-Please do it after GCP SDK installation, Kubernetes Engines, select 
-
-project from top and associate. This will enable the GKE API.  
-
-- Creating a cluster K8S cluster 
-
-https://github.com/lonynamer/Knowledge/tree/master/Terraform/terraf
-
-orm-tutorial/5c_Deploy_cluster  
+- Creating a cluster K8S cluster https://github.com/lonynamer/Knowledge/tree/master/Terraform/terraform-tutorial/5c_Deploy_cluster  
 
 File : install-gcp-skd.sh
 ```
@@ -2667,14 +2329,10 @@ File : install-gcp-skd.sh
 export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
 
 # Add the Cloud SDK distribution URI as a package source
-echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO 
-
-main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 
 # Import the Google Cloud Platform public key
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo 
-
-apt-key add -
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 
 # Update the package list and install the Cloud SDK
 sudo apt-get update && sudo apt-get install google-cloud-sdk
@@ -2690,9 +2348,7 @@ gcloud init
 gcloud projects list
 ```
 ```
-Additionally create a service account with key and download the key 
-
-as `account.json` one folder down where you run terraform codes.
+Additionally create a service account with key and download the key as `account.json` one folder down where you run terraform codes.
 ```
 ```
 mkdir -p kubernetes/k8s-module
@@ -2768,11 +2424,7 @@ variable "node_version" {
 }
 
 variable "dependency_id" {
-  description = "This variable is unused. It is here simple as a 
-
-work around to enforce module dependancy. Github issue 10462, in 
-
-the provider repo"
+  description = "This variable is unused. It is here simple as a work around to enforce module dependancy. Github issue 10462, in the provider repo"
   default     = ""
 }
 ```
@@ -2785,9 +2437,7 @@ data "google_container_engine_versions" "available" {
 }
 
 locals {
-  default_name = "${var.project_id_map[terraform.workspace]}-
-
-cluster"
+  default_name = "${var.project_id_map[terraform.workspace]}-cluster"
   name         = "${local.default_name}"
   primary_zone = "${data.google_compute_zones.available.names[0]}"
   project      = "${var.project_id_map[terraform.workspace]}"
@@ -2854,9 +2504,7 @@ resource "google_container_node_pool" "default" {
   depends_on = ["google_container_cluster.primary"]
 }
 
-# The following outputs allow authentication and connectivity to 
-
-the GKE Cluster.
+# The following outputs allow authentication and connectivity to the GKE Cluster.
 output "connect-string" {
   value = "${join(
     " ",
@@ -2876,28 +2524,18 @@ output "primary_zone" {
 }
 
 output "kubernetes-version" {
-  value = 
-
-"${data.google_container_engine_versions.available.latest_node_vers
-
-ion}"
+  value = "${data.google_container_engine_versions.available.latest_node_version}"
 }
 
 ```
-- You will get connection string output which you will run to get 
-
-connection string for kubectl.  
+- You will get connection string output which you will run to get connection string for kubectl.  
 Like:  
 ```
 Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-connection-command = gcloud container clusters get-credentials 
-
-lony-terraform-demo-cluster --zone us-east1-b --project lony-
-
-terraform-demo
+connection-command = gcloud container clusters get-credentials lony-terraform-demo-cluster --zone us-east1-b --project lony-terraform-demo
 ```
 Run:  
 ```
@@ -2910,16 +2548,8 @@ kubectl get nodes
 ```
 
 ###### KUBERNETES PODS, SERVICES, DEPLOYMENTS
-- PODS : Containers runs inside pods and uses shared storage and 
-
-networking services which are attached to pods. Pod is the smallest 
-
-automic unit of kubernetes. Pods have ephemeral IP addresses and 
-
-they are mortal.  
-- SERVICES:  Offers stable IP address and links to pods by label 
-
-selectors.  
+- PODS : Containers runs inside pods and uses shared storage and networking services which are attached to pods. Pod is the smallest automic unit of kubernetes. Pods have ephemeral IP addresses and they are mortal.  
+- SERVICES:  Offers stable IP address and links to pods by label selectors.  
   - Type:  
     - ClusterIP: Internal Cluster IP  
     - NodePort: Mapping node external IP  
@@ -2927,9 +2557,7 @@ selectors.
     - ExternalName: CNAME mapping  
 - DEPLOYMENTS: Wraps pods,replicasets and replication policies.  
 
-- Create a replication controller (like deployment) with nginx and 
-
-a service with load balancer exposing outside.  
+- Create a replication controller (like deployment) with nginx and a service with load balancer exposing outside.  
 - By kubernetes plugin deployment is not supported use module.  
 
 Config: kubernetes/deployment-service.tf  
@@ -2993,9 +2621,7 @@ resource "kubernetes_service" "example" {
 }
 
 output "lb_ip" {
-  value = 
-
-"${kubernetes_service.example.load_balancer_ingress.0.ip}"
+  value = "${kubernetes_service.example.load_balancer_ingress.0.ip}"
 }
 ```  
 
@@ -3004,14 +2630,10 @@ output "lb_ip" {
 - It consists of 3 components.  
   - `helm` command tool.  
   - `tiller` service runs inside kubernetes services.  
-  - `Charts` are yaml format `helm` bundled packages from a 
-
-repository.  
+  - `Charts` are yaml format `helm` bundled packages from a repository.  
     - There are 2 types of charts.  
       - Official and Unoffial.  
-  - You can find, get from repository, customize, manage, manifest, 
-
-store and install charts by helm.  
+  - You can find, get from repository, customize, manage, manifest, store and install charts by helm.  
 
 Installing `helm`:  
 ```
