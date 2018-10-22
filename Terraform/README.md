@@ -89,6 +89,7 @@ instance_type = "t2.micro"
 ###### Run
 - init: Initializes, does the first configuration and plugins like aws provider described in `tf` file.  
 ```
+```
 terraform init
 ```
 - plan: Shows you a list of options you can apply.  
@@ -109,7 +110,6 @@ terraform show
 terraform destroy
 ```
 - Additionally terraform creates a file `terraform.tfstate` which keeps state of the current infrastructure in JSON format during `apply`. Do not edit it. When you `destoy` or change, it creates `terraform.tfstate.backup` file to keep the track of previous state. 
-
 
 ### Terraform Basics:  
 - Config File Structure  
