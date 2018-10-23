@@ -2723,6 +2723,7 @@ terraform init
 terraform validate
 terraform apply
 ```
+- Visit site https://www.app.lonynamer.com and test if working.  
 - Destroy after tests are completed.  
 ```
 terraform destroy
