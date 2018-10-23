@@ -1475,11 +1475,61 @@ Creating one VPC with a cidr block, 2 public subnets for webservers separated ea
 - Modulel Usage Page: https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/1.46.0  
 - If you need to read the codes and get mode information, you can read the source code by clicking the link in the module page.  Also it may be a good place to learn how to do by plugin and write your own code or module.  
 - https://github.com/terraform-aws-modules/terraform-aws-vpc  
+
 ```
 provider "aws" {
 access_key = "ACCESS_KEY"
 secret_key = "SECRET_KEY"
 region = "eu-central-1"
+}
+
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+
+  name = "complete-example"
+
+  cidr = "10.10.0.0/16"
+
+  azs             = ["eu-west-1b", "eu-west-1c"]
+  public_subnets  = ["10.10.1.0/24", "10.10.2.0/24"]
+  private_subnets = ["10.10.3.0/24", "10.10.4.0/24"]
+
+  enable_nat_gateway = true
+
+  tags = {
+    Owner       = "user"
+    Environment = "terraform.workspace"
+    Name        = "teffaform vpc"
+  }
+}
+```
+
+###### EBS
+- Every instance has a root EBS volume. Elastic block storage. Good practice is keeping your data in an additional EBS volume, so if your instance will be deleted, your data is kept if you set not to delete with the instance option. You can also take snapshots to EBS's and use in clusters.  
+Demo: Create an ebs volume  
+Config: terraform.tf  
+```
+provider "aws" {
+access_key = "ACCESS_KEY"
+secret_key = "SECRET_KET"
+region = "eu-central-1"
+}
+
+resource "aws_ebs_volume" "test" {
+  availability_zone = "eu-central-1a"
+  size = 7
+  type = "gp2"
+  tags {
+  Name = "test-volume"
+  }
+}
+```
+Demo : Create an EBS and attach to an instance  
+Config: terraform.tf  
+```
+provider "aws" {
+access_key = "ACCESS_KEY"
+secret_key = "SECRET_KEY"
 region = "eu-central-1"
 }
 
@@ -1496,26 +1546,6 @@ resource "aws_instance" "web" {
   tags {
   Name = "Web"
   }
-}
-
-resource "aws_ebs_volume" "test" {
-  availability_zone = "eu-central-1a"
-  size = 7
-  type = "gp2"
-  tags {
-  Name = "test-volume"
-  }
-}
-```
-
-###### EBS
-- Every instance has a root EBS volume. Elastic block storage. Good practice is keeping your data in an additional EBS volume, so if your instance will be deleted, your data is kept if you set not to delete with the instance option. You can also take snapshots to EBS's and use in clusters.  
-
-```
-provider "aws" {
-access_key = "ACCESS_KEY"
-secret_key = "SECRET_KET"
-region = "eu-central-1"
 }
 
 resource "aws_ebs_volume" "test" {
