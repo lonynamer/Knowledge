@@ -1778,16 +1778,16 @@ module "example_asg" {
     listener = [
       {
         instance_port = "80"
-        instance_protocol = "HTTP"
+        instance_protocol = "TCP"
         lb_port = "80"
-        lb_protocol = "HTTP"
+        lb_protocol = "TCP"
       },
     ]
 
     health_check = [
       {
-        target = "HTTP:80/"
-        interval = 30
+        target = "TCP:80"
+        interval = 15
         healthy_threshold = 2
         unhealthy_threshold = 2
         timeout = 5
