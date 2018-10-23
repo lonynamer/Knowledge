@@ -2334,13 +2334,14 @@ resource "aws_lambda_function" "lambda" {
 ```
 
 #### REAL LIFE EXAMPLE STACK
-Install highly available, autoscalable `wordpress` site using `aws-rds-mysql` as backend database and `aws-efs` as shared file storage for php files. We have the `lonynamer.com` domain    
+Install highly available, autoscalable `wordpress` site using `aws-rds-mysql` as backend database and `aws-efs` as shared file storage for php files. We have the `lonynamer.com` domain, will create sub-hosted-zone app.lonynamer.com and www.app.lonynamer.com will be addressed to our load-balancer.  
 
-Create the workspace directory `wordpress`.  
+- Create the workspace directory `wordpress`.  
 ```
 mkdir wordpress
 cd wordpress
 ```
+- Add `aws` as provider.  
 Config: providers.tf  
 ```
 provider "aws" {
@@ -2349,6 +2350,7 @@ provider "aws" {
   region = "${var.region}"
 }
 ```
+- Set variables  
 Config: variables.tf  
 ```
 variable "region" {
@@ -2371,6 +2373,7 @@ variable "private_subnets" {
   default = ["10.10.3.0/24","10.10.4.0/24"]
 }
 ```
+- Create a new vpc in our region and 2 private, 2 public subnets under our new vpc.  
 Config : vpc.tf  
 ```
 module "app_vpc" {
@@ -2394,6 +2397,7 @@ output "vpc_id" {
   value       = "${module.app_vpc.vpc_id}"
 }
 ```
+- Create security groups for http, ssh, mysql and efs access.  
 Config: sg.tf  
 ```
 resource "aws_security_group" "http_sg" {
@@ -2458,6 +2462,7 @@ resource "aws_security_group" "mysql_sg" {
   }
 }
 ```
+- Create loadbalancer.  
 Config: elb.tf  
 ```
 module "app_elb" {
@@ -2492,6 +2497,7 @@ module "app_elb" {
   }
 }
 ```
+- Create DNS zone and records.  
 Congif: dns.tf  
 ```
 data "aws_route53_zone" "parent_zone" {
@@ -2522,6 +2528,7 @@ resource "aws_route53_record" "www_app_record" {
   }
 }
 ```
+- Create efs file system and the attachments.  
 Config: efs.tf  
 ```
 resource "aws_efs_file_system" "app_efs" {
@@ -2545,12 +2552,14 @@ resource "aws_efs_mount_target" "app_efs_attch" {
   security_groups = ["${aws_security_group.efs_sg.id}"]
 }
 ```
+- Create mntpnt local interpolation like dynamic variable which will be used in user data of the instances.  
 Config: locals.tf  
 ```
 locals {
   mntpnt = "mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${aws_efs_file_system.app_efs.id}.efs.${var.region}.amazonaws.com:/ /var/www/html/"
 }
 ```
+- Create mysql backend database in private subnets.  
 Config: rds.tf  
 ```
 module "app_db" {
@@ -2598,6 +2607,7 @@ resource "aws_key_pair" "app-ssh-key" {
  public_key = "${tls_private_key.app_ssh_key.public_key_openssh}"
 }
 ```
+- Create autoscalability group with launch configuration which will fork desired instances.  
 Config: asg.tf  
 ```
 module "app_asg" {
@@ -2667,6 +2677,8 @@ EOF
 }
 
 ```
+- Output information
+- Output includes nameservers, mysql endpoint address, db name, db username, db password, mount point, private key for ssh to webservers, load balancer dns name.  
 Config: output.tf  
 ```
 output "nameservers {" {
@@ -2704,6 +2716,16 @@ output "app_ssh_key_pub" {
 output "app_elb_endpoint" {
   value = "${module.app_elb.this_elb_dns_name}"
 }
+```
+- Apply the whole configuration.  
+```
+terraform init
+terraform validate
+terraform apply
+```
+- Destroy after tests are completed.  
+```
+terraform destroy
 ```
 
 #### TERRAFORM USAGE WITH KUBERNETES IN GOOGLE COLUD (GCP)
