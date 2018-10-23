@@ -2334,8 +2334,377 @@ resource "aws_lambda_function" "lambda" {
 ```
 
 #### REAL LIFE EXAMPLE STACK
+Install highly available, autoscalable `wordpress` site using `aws-rds-mysql` as backend database and `aws-efs` as shared file storage for php files. We have the `lonynamer.com` domain    
+
+Create the workspace directory `wordpress`.  
+```
+mkdir wordpress
+cd wordpress
+```
+Config: providers.tf  
+```
+provider "aws" {
+  access_key = "ACCESS_KEY"
+  secret_key = "SECRET_KEY"
+  region = "${var.region}"
+}
+```
+Config: variables.tf  
+```
+variable "region" {
+  default = "eu-central-1"
+}
+
+variable "cidr" {
+  default = "10.10.0.0/16"
+}
+
+variable "azs" {
+  default = ["eu-central-1a","eu-central-1b"]
+}
+
+variable "public_subnets" {
+  default = ["10.10.1.0/24","10.10.2.0/24"]
+}
+
+variable "private_subnets" {
+  default = ["10.10.3.0/24","10.10.4.0/24"]
+}
+```
+Config : vpc.tf  
+```
+module "app_vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+  name = "app_vpc"
+  cidr = "${var.cidr}"
+  azs = "${var.azs}"
+  public_subnets = "${var.public_subnets}"
+  private_subnets = "${var.private_subnets}"
+  enable_dns_hostnames = true
+  enable_nat_gateway = true
+  tags = {
+    name = "app_vpc"
+    owner = "user"
+    environment = "production"
+  }
+}
+
+output "vpc_id" {
+  description = "The ID of the VPC"
+  value       = "${module.app_vpc.vpc_id}"
+}
+```
+Config: sg.tf  
+```
+resource "aws_security_group" "http_sg" {
+  name = "http_sg"
+  vpc_id = "${module.app_vpc.vpc_id}"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "efs_sg" {
+  name = "efs_sg"
+  vpc_id = "${module.app_vpc.vpc_id}"
+  ingress {
+    from_port = 2049
+    to_port = 2049
+    protocol = "tcp"
+    security_groups = ["${aws_security_group.http_sg.id}"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "mysql_sg" {
+  name = "mysql_sg"
+  vpc_id = "${module.app_vpc.vpc_id}"
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    security_groups = ["${aws_security_group.http_sg.id}"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+```
+Config: elb.tf  
+```
+module "app_elb" {
+  source = "terraform-aws-modules/elb/aws"
+  name = "app-elb"
+  subnets = ["${module.app_vpc.public_subnets}"]
+  security_groups = ["${aws_security_group.http_sg.id}"]
+  internal = false
+
+  listener = [
+    {
+      instance_port = "80"
+      instance_protocol = "HTTP"
+      lb_port = "80"
+      lb_protocol = "HTTP"
+    },
+  ]
+
+  health_check = [
+    {
+      target = "HTTP:80/"
+      interval = 15
+      healthy_threshold = 2
+      unhealthy_threshold = 2
+      timeout = 5
+    },
+  ]
+
+  tags = {
+    owner = "user"
+    environment = "production"
+  }
+}
+```
+Congif: dns.tf  
+```
+data "aws_route53_zone" "parent_zone" {
+  name = "lonynamer.com"
+}
+
+resource "aws_route53_zone" "app_zone" {
+  comment = "my app zone"
+  name = "app.lonynamer.com"
+}
+
+resource "aws_route53_record" "ns_app_record" {
+  zone_id = "${data.aws_route53_zone.parent_zone.id}"
+  name = "app.lonynamer.com"
+  type = "NS"
+  ttl = "300"
+  records = ["${aws_route53_zone.app_zone.name_servers}"]
+}
+
+resource "aws_route53_record" "www_app_record" {
+  zone_id = "${aws_route53_zone.app_zone.id}"
+  name = "www.app.lonynamer.com"
+  type = "A"
+  alias = {
+    name = "${module.app_elb.this_elb_dns_name}"
+    zone_id = "${module.app_elb.this_elb_zone_id}"
+    evaluate_target_health = true
+  }
+}
+```
+Config: efs.tf  
+```
+resource "aws_efs_file_system" "app_efs" {
+  creation_token = "app-data"
+  encrypted = false
+  performance_mode = "generalPurpose"
+  throughput_mode = "bursting"
+
+  tags {
+    owner = "user"
+    environment = "production"
+  }
+}
 
 
+resource "aws_efs_mount_target" "app_efs_attch" {
+  depends_on = ["module.app_vpc"]
+  count = "${length(var.azs)}"
+  file_system_id = "${aws_efs_file_system.app_efs.id}"
+  subnet_id      = "${module.app_vpc.public_subnets[count.index]}"
+  security_groups = ["${aws_security_group.efs_sg.id}"]
+}
+```
+Config: locals.tf  
+```
+locals {
+  mntpnt = "mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${aws_efs_file_system.app_efs.id}.efs.${var.region}.amazonaws.com:/ /var/www/html/"
+}
+```
+Config: rds.tf  
+```
+module "app_db" {
+  source = "terraform-aws-modules/rds/aws"
+  identifier = "app-db"
+  engine = "mysql"
+  engine_version = "5.7.23"
+  instance_class = "db.t2.micro"
+  allocated_storage = 20
+  storage_type = "gp2"
+  storage_encrypted = false
+  family = "mysql5.7"
+  major_engine_version = "5.7"
+  port = 3306
+
+  name = "demodb"
+  username = "demodb"
+  password = "pass1234!"
+  vpc_security_group_ids = ["${aws_security_group.mysql_sg.id}"]
+  subnet_ids = ["${module.app_vpc.private_subnets}"]
+
+  maintenance_window = "Mon:00:00-Mon:03:00"
+  backup_window      = "03:00-06:00"
+  backup_retention_period = 35
+
+  create_db_option_group = false
+  skip_final_snapshot = true
+  final_snapshot_identifier = "app-db-snap"
+
+  tags = {
+    owner = "user"
+    environment = "production"
+  }
+}
+```
+Config: key.tf  
+```
+resource "tls_private_key" "app_ssh_key" {
+  algorithm   = "RSA"
+  rsa_bits = "2048"
+}
+
+resource "aws_key_pair" "app-ssh-key" {
+ key_name   = "app-ssh-key"
+ public_key = "${tls_private_key.app_ssh_key.public_key_openssh}"
+}
+```
+Config: asg.tf  
+```
+module "app_asg" {
+  source = "terraform-aws-modules/autoscaling/aws"
+  name = "app-sg"
+
+  lc_name = "app-lc"
+  image_id = "ami-086a09d5b9fa35dc7"
+  instance_type = "t2.micro"
+  security_groups = ["${aws_security_group.http_sg.id}"]
+  load_balancers = ["${module.app_elb.this_elb_id}"]
+  key_name = "${aws_key_pair.app-ssh-key.key_name}"
+  user_data = <<EOF
+#!/bin/bash
+apt-get update
+apt-get -y install nfs-common apache2 apache2-utils php7.0 php7.0-mysql libapache2-mod-php7.0 php7.0-cli php7.0-cgi php7.0-gd
+${local.mntpnt}
+
+if  ! [[ -e /var/www/html/wp-config.php ]] && mount |grep "/var/www/html"; then
+wget -c http://wordpress.org/latest.tar.gz
+tar -xzvf latest.tar.gz
+rsync -av wordpress/* /var/www/html/
+rm -rf wordpress
+mv /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+sed -i 's/localhost/${module.app_db.this_db_instance_address}/g' /var/www/html/wp-config.php
+sed -i 's/database_name_here/${module.app_db.this_db_instance_name}/g' /var/www/html/wp-config.php
+sed -i 's/username_here/${module.app_db.this_db_instance_username}/g' /var/www/html/wp-config.php
+sed -i 's/password_here/${module.app_db.this_db_instance_password}/g' /var/www/html/wp-config.php
+echo 'RewriteEngine On' >> /var/www/html/.htaccess
+echo 'RewriteCond %{HTTP:X-Forwarded-Proto} =http' >> /var/www/html/.htaccess
+echo 'RewriteRule .* https://%{HTTP:Host}%{REQUEST_URI} [L,R=permanent]' >> /var/www/html/.htaccess
+chown -R www-data:www-data /var/www/html/
+chmod -R 755 /var/www/html/
+fi
+systemctl enable apache2
+systemctl start apache2
+systemctl restart apache2
+EOF
+
+  root_block_device = [
+    {
+      volume_type = "gp2"
+      volume_size = "8"
+    },
+  ]
+
+  asg_name = "app-asg"
+  vpc_zone_identifier = ["${module.app_vpc.public_subnets}"]
+  health_check_type = "EC2"
+  min_size = 2
+  max_size = 4
+  desired_capacity = 2
+  wait_for_capacity_timeout = 0
+
+ tags = [
+    {
+      key = "environment"
+      value = "production"
+      propagate_at_launch = true
+    },
+    {
+      key = "project"
+      value = "web_app"
+      propagate_at_launch = true
+    },
+  ]
+}
+
+```
+Config: output.tf  
+```
+output "nameservers {" {
+  value = "${aws_route53_zone.app_zone.name_servers}"
+}
+
+output "app_db_address" {
+  value = "${module.app_db.this_db_instance_address}"
+}
+
+output "app_db_name" {
+  value = "${module.app_db.this_db_instance_name}"
+}
+
+output "app_db_username" {
+  value = "${module.app_db.this_db_instance_username}"
+}
+
+output "app_db_password" {
+  value = "${module.app_db.this_db_instance_password}"
+}
+
+output "mnt_pnt" {
+  value = "${local.mntpnt}"
+}
+
+output "app_ssh_key_prt" {
+  value = "${tls_private_key.app_ssh_key.private_key_pem}"
+}
+
+output "app_ssh_key_pub" {
+  value = "${tls_private_key.app_ssh_key.public_key_openssh}"
+}
+
+output "app_elb_endpoint" {
+  value = "${module.app_elb.this_elb_dns_name}"
+}
+```
 
 #### TERRAFORM USAGE WITH KUBERNETES IN GOOGLE COLUD (GCP)
 - Kubernetes: Kubernetes is an open-source platform designed to automate deploying, scaling and operating application containers developed by Google. Nickname K8S and it's goal to foster an ecosystem of components and tools that releive the burden og running applications. Can orchestrate Dockers and Rocket containers.  
