@@ -1168,6 +1168,57 @@ resource "aws_instance" "example" {
   instance_type = "t2.micro"
 }
 ```
+###### MORE ABOUT WORKSPACES
+- A named container for terraform states for example you can separate staging and production.  
+- You cannot delete default workspace.  
+- Interpolate your workspace within configuration ${terraform.workspace}, workspace that you are working.  
+- `terraform_remote_state` datasourse links the workspace together at a remote location.  
+- So when you create a workspace called staging and apply the same code again, as stage file will be change, resources will be created separately.  
+- By interpolating ${terraform.workspace} == "staging" , you can manipulate what will be created in default workspcace and staging workspace, like separate region, different count numbers in staging etc.  
+```
+# Create
+terraform workspace new staging
+# List
+terraform workspace list
+# Select
+terraform workspace select default
+# Delete
+terraform workspace delete default
+```
+###### WORKSPACE EXAMPLE
+```
+terraform {
+  backend "s3" {
+    bucket = "stefan-terraform-demo"
+    key    = "network/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
+locals {
+  regions = {
+    staging    = "us-west-1"
+    production = "us-east-1"
+  }
+
+  instance_count = {
+    staging    = "1"
+    production = "2"
+  }
+}
+
+module "backend" {
+  source           = "./Backend"
+  region           = "${local.regions[terraform.workspace]}"
+  number_instances = "${local.instance_count[terraform.workspace]}"
+}
+
+module "frontend" {
+  source           = "./Frontend"
+  region           = "${local.regions[terraform.workspace]}"
+  number_instances = "${local.instance_count[terraform.workspace]}"
+}
+```
 
 #### SOFTWARE PROVISIONING WITH PROVISIONERS
 - Software Provisioner: help executing scripts on a local or remote machine.  Many provisioners require access to the remote resource `SSH` port `22` or `WINRM` port `5985`. Any connection information used in a resource applies to all provisioners.  
