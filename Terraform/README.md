@@ -7,6 +7,11 @@
 - You can codify a complete DC through archivable version controlled code.  
 - Orchestrate across multiple cloud services like AWS, Azure, GCP within a single definition. 
 - It's cloud agnostic.   
+- It is an Iac tool for building, changing and versioning infrastructure safely supports most popular cloud and on-premise service providers.  
+  - Infrastructure as a code: IaC.  
+  - Execution Plans: Terraform generates a execution plan.  
+  - Resource Graph:  It builds a graph of all resources, parallelizes non-depended resource creation and modification.  
+  - Change Automation:  With execution plan and resoure graph, you know exacly what Terraform will change. You can take `terraform graph` output and convert to chart drawing by third party tools.  
 
 ###### What is infrastructure as code (`IAC`) ?  
 - Describing an infrastructure as a code, keeping in `VCS` like `Git` and shaping the infrustructure by code changes done in `Git` automatedly by using a CI/CD tool like `Jenkins`, CircleCI, Travis.  
@@ -109,7 +114,9 @@ terraform show
 ```
 terraform destroy
 ```
-- Additionally terraform creates a file `terraform.tfstate` which keeps state of the current infrastructure in JSON format during `apply`. Do not edit it. When you `destoy` or change, it creates `terraform.tfstate.backup` file to keep the track of previous state. 
+- Additionally terraform creates a file `terraform.tfstate` which keeps state of the current infrastructure in JSON format during `apply`. Do not edit it. When you `destoy` or change, it creates `terraform.tfstate.backup` file to keep the track of previous state.  
+- Terraform keeps the state of the file `terraform.tfstate`, it's important to put it in a shared location like `S3` and source code in `GIT` in collaborated teams.  
+- Terraform according to tfstate file knows the situation of resources which it created.  
 
 ### Terraform Basics:  
 - Config File Structure  
@@ -571,6 +578,7 @@ resource "aws_instance" "vpn" {
 ```
 
 ###### BUILT-IN FUNCTIONS: concat, join, contains, merge, length, replace
+- https://www.terraform.io/docs/configuration/interpolation.html  
 - `concat` : Blends 2 lists into one.  
 ```
 concat(aws_instance,db,*,tags.Name, aws_instance.web.*.tags.Name)
@@ -598,7 +606,20 @@ ${length(split(",", "a,b,c"))} = 3
 ${length("a,b,c")} = 5
 ${length(map("key", "val"))} = 1
 ```
-- Replace(string, search, replace)
+- Replace(string, search, replace)  
+
+- Some more build-in functions    
+```
+abs(float) - Returns the absolute value of a given float. Example: abs(1) returns 1, and abs(-1) would also return 1, whereas abs(-3.14) would return 3.14. See also the signum function.
+abs(float) - Returns the absolute value of a given float. Example: abs(1) returns 1, and abs(-1) would also return 1, whereas abs(-3.14) would return 3.14. See also the signum function.
+basename(path) - Returns the last element of a path.
+base64decode(string) - Given a base64-encoded string, decodes it and returns the original string.
+base64encode(string) - Returns a base64-encoded representation of the given string.
+base64gzip(string) - Compresses the given string with gzip and then encodes the result to base64. This can be used with certain resource arguments that allow binary data to be passed with base64 encoding, since Terraform strings are required to be valid UTF-8.
+base64sha256(string) - Returns a base64-encoded representation of raw SHA-256 sum of the given string. This is not equivalent of base64encode(sha256(string)) since sha256() returns hexadecimal representation.
+base64sha512(string) - Returns a base64-encoded representation of raw SHA-512 sum of the given string. This is not equivalent of base64encode(sha512(string)) since sha512() returns hexadecimal representation.
+bcrypt(password, cost) - Returns the Blowfish encrypted hash of the string at the given cost. A default cost of 10 will be used if not provided.
+```
 
 ###### TERRAFORM CONSOLE COMMAND
 - It's a command to perform experimantal math operations.  
@@ -2729,6 +2750,12 @@ terraform apply
 terraform destroy
 ```
 
+###### LANDING ZONES
+- Terraform can create also landing zones. It's an expensive solution like 500 $ a month for each zone but is a good practice.  
+- AWS Landing Zone is a solution that helps customers more quickly set up a secure, multi-account AWS environment based on AWS best practices. With the large number of design choices, setting up a multi-account environment can take a significant amount of time, involve the configuration of multiple accounts and services, and require a deep understanding of AWS services. This solution can help save time by automating the set-up of an environment for running secure and scalable workloads while implementing an initial security baseline through the creation of core accounts and resources.  
+- AWS Landing Zone deploys an AWS Account Vending Machine (AVM) product for provisioning and automatically configuring new accounts. The AVM leverages AWS Single Sign-On for managing user account access. This environment is customizable to allow customers to implement their own account baselines through a Landing Zone configuration and update pipeline. To learn more about AWS Landing Zone, see the solution webpage.  
+- Additional solution offerings can be found on the AWS Answers webpage, where you can browse common questions by category. These pages provide a combination of Solution Briefs and comprehensive Solutions, which are AWS-vetted, automated, turnkey reference implementations that address specific business needs.  
+
 #### TERRAFORM USAGE WITH KUBERNETES IN GOOGLE COLUD (GCP)
 - Kubernetes: Kubernetes is an open-source platform designed to automate deploying, scaling and operating application containers developed by Google. Nickname K8S and it's goal to foster an ecosystem of components and tools that releive the burden og running applications. Can orchestrate Dockers and Rocket containers.  
 - Kubernetes, runs everywhere, extenible, open source and self-healing.  Leader, has massive community and market standard.  
@@ -3092,15 +3119,13 @@ resource "helm_release" "mongo" {
 terraform destroy
 ```
 
-
-
-QUESTIONS  
-- Check how count.index works.  
-- Count, availability zone olayi. anla  
-- what happens, if you delete tfstate file.  
-- how to secure passwords and keys.  
-- How to download/install edit modules.    
+###### QUESTIONS  
+- How to secure passwords and keys.  
+```
+AWS keymanagement, vault server.  
+```
+- Learn `consul` product of HashiCorp, there is a way to keep the state files.  
 - What is consul to keep the state.  
 - turn back to 27 learn taint  
 - turn back to 28 learn workspace  
-- REAL LIFE EXAMPLE DO AGAIN  
+
