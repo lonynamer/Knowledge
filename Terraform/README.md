@@ -17,7 +17,7 @@
 - Describing an infrastructure as a code, keeping in `VCS` like `Git` and shaping the infrustructure by code changes done in `Git` automatedly by using a CI/CD tool like `Jenkins`, CircleCI, Travis.  
 - Same tools and processes software developers use.   
 
-###### How `Terraform` differs from other automation tools like Chef, Puppet, Ansible ?  
+###### How `Terraform` differs from other automation tools like Chef, Puppet ?  
 - Puppet and chef configuration management tools focuses software installation and configuration on machines.  
 - Terraform is used for one level down to shape your infrastructue and it's cloud agnostic.  
 - Difference from `CloudFormation`, `Azure ARM (Resource Manager)`, `Heat`, it supports multiple clouds.  
@@ -1462,7 +1462,18 @@ resource "null_resource" "ansible-provision" {
 output "frontend_ip" {
   value = "${aws_instance.frontend.public_ip}"
 }
+```
 
+- Terraform `taint`  
+- Taint marks a resource to recreate.  
+- In ansible provisioner example, ansible's null_resource is bounded to another resource by `depends_on`, so, it will run only when the dependent resource created because we don't want to run it all the time but what if we did some changes and we would like to run the provisioning again ? In this situation, we can use taint.  
+```
+# Mark a resource to recreate(destroy and create) in next apply
+terraform taint aws.instance.test2
+# See the tainted
+terraform plan
+# Removing mark taint before
+terraform untaint aws.instance.test2
 ```
 
 #### AWS ON TERRAFORM:  
@@ -3125,7 +3136,6 @@ terraform destroy
 AWS keymanagement, vault server.  
 ```
 - Learn `consul` product of HashiCorp, there is a way to keep the state files.  
-- What is consul to keep the state.  
-- turn back to 27 learn taint  
+- What is consul to keep the state.  A product of hashiCorp.  
 - turn back to 28 learn workspace  
 
