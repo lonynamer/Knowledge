@@ -131,6 +131,7 @@ kops edit ig nodes
 kops update cluster
 # To bring up back set the same numbers before 1 master, 2 nodes
 kops update cluster --yes
+# kops rolling-update cluster --yes  # is a more elegant way to update cluster without interruptions after a change.
 ```
 
 ###### SETUP CENTRALIZED LOGGING
