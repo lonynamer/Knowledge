@@ -129,14 +129,14 @@ kops edit ig nodes
 # Reduce for master and nodes MinSize and MaxSize to 0 and `wq!` like `vi` .
 kops update cluster
 # To bring up back set the same numbers before 1 master, 2 nodes
-kops update cluster
+kops update cluster --yes
 ```
 
 ###### SETUP CENTRALIZED LOGGING
 - You need at least 7.5 - 8 GB memory for all this configuration.  
 
 
-###### NOT FINISHED, JUST STARTED AND WILL BE CONTINUED !!!
+### NOT FINISHED, JUST STARTED AND WILL BE CONTINUED !!!
 
 
 
