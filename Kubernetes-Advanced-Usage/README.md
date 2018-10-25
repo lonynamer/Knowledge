@@ -119,6 +119,7 @@ kops validate cluster
 ```
 - Your cluster is ready and `kubectl` is configured to talk with API.  
 - Deleting and creating the cluster too many times will hit S3 push pull limitations for free-tier.  
+- Stop the instances when you don't use by bringing down the cluster.  
 - When ever you would like to bring down this cluster but not to delete it to continue later.  
 ```
 export KOPS_STATE_STORE = s3://mycluster-state
@@ -135,7 +136,7 @@ kops update cluster
 - You need at least 7.5 - 8 GB memory for all this configuration.  
 
 
-###### NOT FINISHED, JUST STARTED AND WILL BE CONTINUED.....
+###### NOT FINISHED, JUST STARTED AND WILL BE CONTINUED !!!
 
 
 
