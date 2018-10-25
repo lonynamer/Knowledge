@@ -175,7 +175,7 @@ kops create cluster \
  --zones=eu-central-1b \
  --master-zones=eu-central-1b \
  --networking=flannel \
- --master-count=2 \
+ --node-count=2 \
  --master-count=1 \
  --master-size=t2.micro \
  --node-size=t2.micro \
@@ -294,7 +294,7 @@ kops create cluster \
  --zones=eu-central-1b \
  --master-zones=eu-central-1b \
  --networking=flannel \
- --master-count=2 \
+ --node-count=2 \
  --master-count=1 \
  --master-size=t2.micro \
  --node-size=t2.micro \
