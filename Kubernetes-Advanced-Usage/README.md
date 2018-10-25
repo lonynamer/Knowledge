@@ -118,6 +118,18 @@ export KOPS_STATE_STORE=s3://mycluster-state
 kops validate cluster
 ```
 - Your cluster is ready and `kubectl` is configured to talk with API.  
+- Deleting and creating the cluster too many times will hit S3 push pull limitations for free-tier.  
+- When ever you would like to bring down this cluster but not to delete it to continue later.  
+```
+export KOPS_STATE_STORE = s3://mycluster-state
+kops get ig
+kops edit ig master-eu-central-1b
+kops edit ig nodes
+# Reduce for master and nodes MinSize and MaxSize to 0 and `wq!` like `vi` .
+kops update cluster
+# To bring up back set the same numbers before 1 master, 2 nodes
+kops update cluster
+```
 
 ###### SETUP CENTRALIZED LOGGING
 - You need at least 7.5 - 8 GB memory for all this configuration.  
