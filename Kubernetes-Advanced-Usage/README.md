@@ -94,6 +94,7 @@ install_kops
 ssh-keygen
 ```
 - Create a small cluster by `kops`, in this scenario cluster is created in eu-cental-1 region's eu-central-1b zone.  
+- `KOPS` uses launch configurations and autoscaling groups, in addition to scaling `PODS`, it's possible to autoscale and update the underlying infrastructure very easily rolling-update style.  It's a very reliable infrastructure. Even you will delete the instances holding the masters and nodes, autoscaling will launch the instances and everything will be built up back from the cluster-state that sits in S3 bucket including the pods,statefulsets, deployments, services (Unless you don't delete backend data). Enabling versioning on S3 bucket will add more reliability and roleback. Kubernetes as well working in a current state and desired state mentality, when code changes, infrastructure changes.  
 ```
 kops create cluster \
  --name=mycluster.kops.lonynamer.com \
