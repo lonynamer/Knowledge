@@ -751,8 +751,8 @@ metadata:
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
 ```
-
-Config: `Kibana` Deployment
+- `Kibana` Deployment  
+Config: kibana-deployment.yaml  
 ```
 apiVersion: extensions/v1beta1
 kind: Deployment
